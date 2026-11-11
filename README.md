@@ -1,56 +1,54 @@
-# Welcome to your Expo app 👋
+# Cognify
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Upload anything, then learn it the Duolingo way. Cognify turns your notes, articles and documents into short, game-like courses: lessons on a winding path, quick exercises, XP, streaks and a daily goal.
 
-## Get started
+## What's in this starter
 
-1. Install dependencies
+| Area | What it does |
+| --- | --- |
+| **Learn tab** (`src/app/(tabs)/index.tsx`) | Streak and XP, a daily-goal bar, your courses, and a one-tap **sample course** |
+| **Library tab** (`src/app/(tabs)/library.tsx`) | Every resource you've added, with **Make a course** on each |
+| **Profile tab** (`src/app/(tabs)/profile.tsx`) | Stats, daily-goal picker, reset |
+| **Add resource** (`src/app/add-source.tsx`) | Paste text or upload a `.txt` / `.md` / `.csv` / `.json` file, then say what you want to learn |
+| **Course path** (`src/app/course/[id].tsx`) | A zig-zag lesson path with completed, current and locked lessons |
+| **Lesson player** (`src/app/lesson/[courseId]/[lessonId].tsx`) | Multiple choice, true/false, fill-in-the-blank and flashcards; instant feedback; missed questions come back at the end; XP and accuracy results |
+| **AI course builder** (`src/app/api/generate+api.ts`) | A server API route that sends your sources to Claude and gets back a structured course |
+| **Offline fallback** (`src/lib/localGenerator.ts`) | Builds a simpler course on the device when the AI isn't configured or reachable, so the app always works |
 
-   ```bash
-   npm install
-   ```
+Progress is saved on the device (SQLite key-value store on iOS/Android, `localStorage` on web). All colours live in `src/theme/colors.ts`.
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Run it
 
 ```bash
-npm run reset-project
+npm install
+npx expo start
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Press `w` for web, or open it in Expo Go / a development build.
 
-### Other setup steps
+### Turn on the AI
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Without a key, Cognify builds offline drafts (labelled "offline draft"). To have Claude build real courses, create `.env.local` in the project root:
 
-## Learn more
+```bash
+ANTHROPIC_API_KEY=sk-ant-...
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Then restart `npx expo start`. The key is read only by the server route and is never bundled into the app. Don't prefix it with `EXPO_PUBLIC_`, which would ship it to every phone.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+In development, native apps reach the API route through the Expo dev server automatically. For production you need to deploy the server (for example with EAS Hosting) and set the `origin` option of the `expo-router` plugin in `app.json` to that URL.
 
-## Join the community
+## Checks
 
-Join our community of developers creating universal apps.
+```bash
+npx tsc --noEmit
+npx expo lint
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Ideas for the next round
+
+- PDF, web links and YouTube transcripts as sources (NotebookLM-style)
+- Spaced-repetition review sessions built from past mistakes
+- Hearts/lives, leagues and streak freezes
+- An "Ask your sources" chat tutor
+- Accounts and cloud sync
