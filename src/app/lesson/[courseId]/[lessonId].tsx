@@ -8,7 +8,7 @@ import { ChunkyButton, Icon, Muted, ProgressBar } from "@/components/ui";
 import { xpForLesson } from "@/lib/progress";
 import { completeLesson, useAppState } from "@/lib/store";
 import type { Exercise } from "@/lib/types";
-import { colors, palette } from "@/theme/colors";
+import { colors } from "@/theme/colors";
 
 type QueueItem = { exercise: Exercise; retry: boolean; key: string };
 
@@ -51,7 +51,7 @@ export default function LessonScreen() {
       <View style={[styles.center, { paddingTop: insets.top }]}>
         <Muted>This lesson couldn’t be found.</Muted>
         <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: colors.xp, fontWeight: "800" }}>Go back</Text>
+          <Text style={{ color: colors.primary, fontWeight: "800" }}>Go back</Text>
         </Pressable>
       </View>
     );
@@ -147,7 +147,7 @@ export default function LessonScreen() {
                 label="Got it"
                 color={colors.correct}
                 shadowColor={colors.correctShadow}
-                textColor={palette.darkAmethyst}
+                textColor={colors.textOnPrimary}
                 onPress={() => advance(true)}
                 style={{ flex: 1 }}
               />
@@ -166,7 +166,7 @@ export default function LessonScreen() {
         >
           <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <View style={[styles.feedbackIcon, { backgroundColor: isCorrect ? colors.correct : colors.wrong }]}>
-              <Icon name={isCorrect ? "check" : "close"} size={20} color={palette.darkAmethyst} />
+              <Icon name={isCorrect ? "check" : "close"} size={20} color={colors.textOnPrimary} />
             </View>
             <Text style={[styles.feedbackTitle, { color: isCorrect ? colors.correct : colors.wrong }]}>
               {isCorrect ? pick(PRAISE) : "Not quite"}
@@ -182,7 +182,7 @@ export default function LessonScreen() {
             label="Continue"
             color={isCorrect ? colors.correct : colors.wrong}
             shadowColor={isCorrect ? colors.correctShadow : colors.wrongShadow}
-            textColor={palette.darkAmethyst}
+            textColor={colors.textOnPrimary}
             onPress={() => advance(isCorrect)}
           />
         </Animated.View>
@@ -212,8 +212,8 @@ function Option({
   onPress: () => void;
 }) {
   const border =
-    state === "correct" ? colors.correct : state === "wrong" ? colors.wrong : selected ? palette.frozenLake : colors.surfaceRaised;
-  const bg = state === "correct" ? colors.correctBg : state === "wrong" ? colors.wrongBg : selected ? "#2c2363" : colors.surface;
+    state === "correct" ? colors.correct : state === "wrong" ? colors.wrong : selected ? colors.primary : colors.border;
+  const bg = state === "correct" ? colors.correctBg : state === "wrong" ? colors.wrongBg : selected ? colors.surfaceRaised : colors.surface;
 
   return (
     <Pressable
@@ -237,7 +237,7 @@ function Option({
 function Flashcard({ exercise, flipped, onFlip }: { exercise: Exercise; flipped: boolean; onFlip: () => void }) {
   return (
     <Pressable onPress={onFlip} accessibilityRole="button" accessibilityHint="Flips the card">
-      <View style={[styles.card, flipped && { backgroundColor: colors.secondary, borderColor: colors.secondaryShadow }]}>
+      <View style={[styles.card, flipped && { backgroundColor: colors.surfaceWarmLight, borderColor: colors.surfaceWarm }]}>
         <Text style={styles.cardEyebrow}>{flipped ? "ANSWER" : "TAP TO REVEAL"}</Text>
         <Text style={styles.cardFront}>{exercise.prompt}</Text>
         {flipped ? (
@@ -265,7 +265,7 @@ function Results({ xp, accuracy, title }: { xp: number; accuracy: number; title:
         <ResultTile
           label="ACCURACY"
           value={`${pct}%`}
-          color={pct >= 80 ? palette.frozenLake : palette.darkOrange}
+          color={pct >= 80 ? colors.correct : colors.secondary}
           icon="star"
         />
       </View>
@@ -280,7 +280,7 @@ function ResultTile({ label, value, color, icon }: { label: string; value: strin
       <Text style={[styles.tileLabel, { backgroundColor: color }]}>{label}</Text>
       <View style={styles.tileBody}>
         <Icon name={icon} size={22} color={color} />
-        <Text style={[styles.tileValue, { color }]}>{value}</Text>
+        <Text style={styles.tileValue}>{value}</Text>
       </View>
     </View>
   );
@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 14,
     borderTopWidth: 2,
-    borderTopColor: colors.surface,
+    borderTopColor: colors.border,
   },
   feedback: { paddingHorizontal: 20, paddingTop: 18, gap: 12, borderTopLeftRadius: 24, borderTopRightRadius: 24 },
   feedbackIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
@@ -328,30 +328,30 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     borderWidth: 2,
     borderBottomWidth: 6,
-    borderColor: colors.primaryShadow,
-    backgroundColor: colors.surfaceRaised,
+    borderColor: colors.secondary,
+    backgroundColor: colors.surface,
     padding: 24,
     gap: 14,
     justifyContent: "center",
   },
-  cardEyebrow: { color: palette.royalGold, fontWeight: "900", letterSpacing: 1.2, fontSize: 12 },
+  cardEyebrow: { color: colors.primary, fontWeight: "900", letterSpacing: 1.2, fontSize: 12 },
   cardFront: { color: colors.text, fontSize: 24, fontWeight: "900", lineHeight: 31 },
-  cardDivider: { borderTopWidth: 2, borderTopColor: "rgba(255,255,255,0.2)", paddingTop: 14 },
+  cardDivider: { borderTopWidth: 2, borderTopColor: colors.border, paddingTop: 14 },
   cardBack: { color: colors.text, fontSize: 18, fontWeight: "600", lineHeight: 26 },
   resultBadge: {
     width: 130,
     height: 130,
     borderRadius: 65,
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.surface,
     borderWidth: 4,
     borderColor: colors.xp,
     alignItems: "center",
     justifyContent: "center",
   },
-  resultTitle: { color: colors.xp, fontSize: 30, fontWeight: "900" },
+  resultTitle: { color: colors.text, fontSize: 30, fontWeight: "900" },
   tile: { flex: 1, borderWidth: 2, borderRadius: 18, overflow: "hidden" },
   tileLabel: {
-    color: palette.darkAmethyst,
+    color: colors.text,
     fontWeight: "900",
     fontSize: 12,
     letterSpacing: 1,
@@ -359,5 +359,5 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   tileBody: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16 },
-  tileValue: { fontSize: 24, fontWeight: "900", fontVariant: ["tabular-nums"] },
+  tileValue: { color: colors.text, fontSize: 24, fontWeight: "900", fontVariant: ["tabular-nums"] },
 });

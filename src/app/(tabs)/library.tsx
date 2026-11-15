@@ -6,7 +6,7 @@ import { Card, ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
 import { removeSource, useAppState } from "@/lib/store";
 import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors, palette } from "@/theme/colors";
+import { colors } from "@/theme/colors";
 
 export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
@@ -24,7 +24,7 @@ export default function LibraryScreen() {
 
       {sources.length === 0 ? (
         <Card style={{ alignItems: "center", gap: 10, paddingVertical: 28 }}>
-          <Icon name="doc" size={40} color={palette.softPeriwinkle} />
+          <Icon name="doc" size={40} color={colors.secondaryShadow} />
           <Muted style={{ textAlign: "center" }}>No resources yet. Paste some notes or upload a text file to get started.</Muted>
         </Card>
       ) : (
@@ -42,7 +42,7 @@ function SourceRow({ source }: { source: Source }) {
     <Card style={{ gap: 12 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <View style={styles.iconBox}>
-          <Icon name={source.kind === "file" ? "doc" : "paste"} size={22} color={palette.frozenLake} />
+          <Icon name={source.kind === "file" ? "doc" : "paste"} size={22} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={1}>
@@ -68,6 +68,7 @@ function SourceRow({ source }: { source: Source }) {
         icon="sparkles"
         color={colors.secondary}
         shadowColor={colors.secondaryShadow}
+        textColor={colors.text}
         loading={busy}
         onPress={() => create("", [source])}
       />
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.background,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Icon, Muted, ProgressBar } from "@/components/ui";
 import { courseProgress, lessonKey } from "@/lib/progress";
 import { removeCourse, useAppState } from "@/lib/store";
-import { colors, palette } from "@/theme/colors";
+import { colors } from "@/theme/colors";
 
 // Horizontal offsets for the winding lesson path.
 const ZIGZAG = [0, 60, 90, 60, 0, -60, -90, -60];
@@ -22,7 +22,7 @@ export default function CourseScreen() {
       <View style={[styles.center, { paddingTop: insets.top }]}>
         <Muted>This course no longer exists.</Muted>
         <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: colors.xp, fontWeight: "800" }}>Go back</Text>
+          <Text style={{ color: colors.primary, fontWeight: "800" }}>Go back</Text>
         </Pressable>
       </View>
     );
@@ -79,7 +79,7 @@ export default function CourseScreen() {
             const offset = ZIGZAG[i % ZIGZAG.length];
 
             const fill = done ? colors.xp : current ? colors.primary : colors.locked;
-            const edge = done ? palette.orange : current ? colors.primaryShadow : "#2e1240";
+            const edge = done ? colors.xpShadow : current ? colors.primaryShadow : colors.lockedEdge;
             const open = () =>
               router.push({
                 pathname: "/lesson/[courseId]/[lessonId]",
@@ -111,7 +111,7 @@ export default function CourseScreen() {
                       <Icon
                         name={done ? "check" : locked ? "lock" : "star"}
                         size={32}
-                        color={locked ? colors.lockedText : done ? palette.darkAmethyst : colors.text}
+                        color={locked ? colors.lockedText : done ? colors.text : colors.textOnPrimary}
                       />
                     </View>
                   )}
@@ -143,20 +143,20 @@ const styles = StyleSheet.create({
     gap: 12,
     backgroundColor: colors.background,
     borderBottomWidth: 2,
-    borderBottomColor: colors.surface,
+    borderBottomColor: colors.border,
   },
   headerRow: { flexDirection: "row", alignItems: "center", gap: 14 },
   headerTitle: { flex: 1, color: colors.text, fontSize: 18, fontWeight: "900" },
   banner: {
     marginTop: 18,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.surfaceWarm,
     borderRadius: 20,
     borderBottomWidth: 5,
-    borderBottomColor: colors.secondaryShadow,
+    borderBottomColor: colors.surfaceWarmEdge,
     padding: 16,
     gap: 6,
   },
-  bannerEyebrow: { color: palette.frozenLake, fontWeight: "900", fontSize: 12, letterSpacing: 1 },
+  bannerEyebrow: { color: colors.primaryShadow, fontWeight: "900", fontSize: 12, letterSpacing: 1 },
   bannerText: { color: colors.text, fontSize: 15, fontWeight: "600", lineHeight: 21 },
   node: {
     width: NODE,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  nodeRing: { borderWidth: 4, borderColor: palette.mauve },
+  nodeRing: { borderWidth: 4, borderColor: colors.secondary },
   nodeLabel: {
     color: colors.textMuted,
     fontWeight: "700",
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   startBubble: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.background,
     borderColor: colors.primary,
     borderWidth: 2,
     paddingHorizontal: 14,
@@ -183,6 +183,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
   },
-  startText: { color: colors.xp, fontWeight: "900", letterSpacing: 1 },
+  startText: { color: colors.primary, fontWeight: "900", letterSpacing: 1 },
   trophy: { alignItems: "center", marginTop: 8 },
 });

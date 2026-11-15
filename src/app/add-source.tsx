@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
 import { addSource } from "@/lib/store";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors, palette } from "@/theme/colors";
+import { colors } from "@/theme/colors";
 
 type Mode = "paste" | "file";
 
@@ -92,8 +92,8 @@ export default function AddSourceScreen() {
               accessibilityRole="tab"
               accessibilityState={{ selected: mode === m }}
             >
-              <Icon name={m === "paste" ? "paste" : "upload"} size={18} color={mode === m ? colors.text : colors.textFaint} />
-              <Text style={[styles.segmentText, mode === m && { color: colors.text }]}>
+              <Icon name={m === "paste" ? "paste" : "upload"} size={18} color={mode === m ? colors.textOnPrimary : colors.textFaint} />
+              <Text style={[styles.segmentText, mode === m && { color: colors.textOnPrimary }]}>
                 {m === "paste" ? "Paste text" : "Upload file"}
               </Text>
             </Pressable>
@@ -124,7 +124,7 @@ export default function AddSourceScreen() {
           </Field>
         ) : (
           <Pressable onPress={pickFile} style={styles.dropZone}>
-            <Icon name={fileName ? "doc" : "upload"} size={34} color={palette.frozenLake} />
+            <Icon name={fileName ? "doc" : "upload"} size={34} color={colors.primary} />
             <Text style={styles.dropTitle}>{fileName ?? "Choose a file"}</Text>
             <Muted style={{ textAlign: "center", fontSize: 13 }}>
               {fileName ? `${words.toLocaleString()} words loaded · tap to replace` : ".txt, .md, .csv or .json for now — PDFs coming next"}
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
   },
-  segmentActive: { backgroundColor: colors.secondary },
+  segmentActive: { backgroundColor: colors.primary },
   segmentText: { color: colors.textFaint, fontWeight: "800" },
   label: { color: colors.text, fontWeight: "800", fontSize: 15 },
   hint: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   dropZone: {
     borderWidth: 2,
     borderStyle: "dashed",
-    borderColor: palette.softPeriwinkle,
+    borderColor: colors.secondary,
     borderRadius: 20,
     paddingVertical: 32,
     paddingHorizontal: 20,
