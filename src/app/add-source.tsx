@@ -1,5 +1,3 @@
-import * as DocumentPicker from "expo-document-picker";
-import { File } from "expo-file-system";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -15,14 +13,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
+import { pickTextFile } from "@/lib/pickTextFile";
 import { addSource } from "@/lib/store";
 import { useCreateCourse } from "@/lib/useCreateCourse";
 import { colors } from "@/theme/colors";
 
 type Mode = "paste" | "file";
-
-// Plain-text formats we can read on-device today. PDF/Docs/links are next.
-const TEXT_TYPES = ["text/*", "application/json", "text/markdown", "text/csv"];
 
 export default function AddSourceScreen() {
   const insets = useSafeAreaInsets();
@@ -36,15 +32,12 @@ export default function AddSourceScreen() {
 
   async function pickFile() {
     setError(null);
-    const result = await DocumentPicker.getDocumentAsync({ type: TEXT_TYPES, copyToCacheDirectory: true });
-    if (result.canceled) return;
-    const asset = result.assets[0];
     try {
-      const text = asset.file ? await asset.file.text() : await new File(asset.uri).text();
-      if (!text.trim()) throw new Error("That file looks empty.");
-      setContent(text);
-      setFileName(asset.name);
-      if (!title) setTitle(asset.name.replace(/\.[^.]+$/, ""));
+      const picked = await pickTextFile();
+      if (!picked) return;
+      setContent(picked.text);
+      setFileName(picked.name);
+      if (!title) setTitle(picked.name.replace(/\.[^.]+$/, ""));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Couldn't read that file. Try a .txt or .md file.");
     }
