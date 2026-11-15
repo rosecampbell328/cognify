@@ -19,11 +19,12 @@ function notify(title: string, message: string) {
 export function useCreateCourse() {
   const [busy, setBusy] = useState(false);
 
-  async function create(goal: string, sources: Source[], opts: { replace?: boolean } = {}) {
+  async function create(goal: string, sources: Source[], opts: { replace?: boolean; title?: string } = {}) {
     if (busy) return;
     setBusy(true);
     try {
       const { course, notice } = await generateCourse(goal, sources);
+      if (opts.title?.trim()) course.title = opts.title.trim();
       addCourse(course);
       const go = opts.replace ? router.replace : router.push;
       go({ pathname: "/course/[id]", params: { id: course.id } });

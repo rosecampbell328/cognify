@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,46 +14,52 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
-import { pickTextFile } from "@/lib/pickTextFile";
+import { pickFiles, type PickedFile } from "@/lib/pickFiles";
 import { addSource } from "@/lib/store";
+import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
 import { colors } from "@/theme/colors";
 
-type Mode = "paste" | "file";
+const countWords = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);
+const stripExt = (name: string) => name.replace(/\.[^.]+$/, "");
 
 export default function AddSourceScreen() {
   const insets = useSafeAreaInsets();
-  const [mode, setMode] = useState<Mode>("paste");
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [pasted, setPasted] = useState("");
+  const [files, setFiles] = useState<PickedFile[]>([]);
   const [goal, setGoal] = useState("");
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
   const { create, busy } = useCreateCourse();
 
-  async function pickFile() {
-    setError(null);
+  async function addFiles() {
+    setErrors([]);
+    setReading(true);
     try {
-      const picked = await pickTextFile();
-      if (!picked) return;
-      setContent(picked.text);
-      setFileName(picked.name);
-      if (!title) setTitle(picked.name.replace(/\.[^.]+$/, ""));
+      const result = await pickFiles();
+      if (!result) return;
+      setFiles((prev) => [...prev, ...result.files]);
+      setErrors(result.errors);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Couldn't read that file. Try a .txt or .md file.");
+      setErrors([e instanceof Error ? e.message : "Couldn't open those files."]);
+    } finally {
+      setReading(false);
     }
   }
 
-  const words = content.trim() ? content.trim().split(/\s+/).length : 0;
-  const ready = content.trim().length > 80;
+  const pastedReady = pasted.trim().length > 80;
+  const ready = pastedReady || files.length > 0;
+  const totalWords = countWords(pasted) + files.reduce((n, f) => n + countWords(f.text), 0);
 
   async function submit() {
-    const source = addSource({
-      title: title.trim() || "Untitled notes",
-      kind: mode === "file" ? "file" : "text",
-      content: content.trim(),
-    });
-    await create(goal.trim(), [source], { replace: true });
+    const sources: Source[] = files.map((f) =>
+      addSource({ title: stripExt(f.name), kind: f.kind === "pdf" ? "pdf" : "file", content: f.text.trim() }),
+    );
+    if (pastedReady) {
+      sources.push(addSource({ title: title.trim() || "Pasted notes", kind: "text", content: pasted.trim() }));
+    }
+    await create(goal.trim(), sources, { replace: true, title });
   }
 
   return (
@@ -60,40 +67,43 @@ export default function AddSourceScreen() {
       <ScrollView
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          paddingTop: (Platform.OS === "ios" ? 16 : insets.top + 12),
+          paddingTop: Platform.OS === "ios" ? 16 : insets.top + 12,
           paddingBottom: insets.bottom + 24,
           paddingHorizontal: 18,
           gap: 16,
         }}
       >
-        <View style={styles.header}>
-          <Pressable accessibilityLabel="Close" hitSlop={12} onPress={() => router.back()}>
-            <Icon name="close" size={22} color={colors.textMuted} />
-          </Pressable>
+        <Pressable accessibilityLabel="Close" hitSlop={12} onPress={() => router.back()}>
+          <Icon name="close" size={22} color={colors.textMuted} />
+        </Pressable>
+
+        <Heading>New course</Heading>
+
+        {/* Chat with AI */}
+        <Pressable
+          onPress={() => router.push("/create-chat")}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.chatCard, pressed && { transform: [{ translateY: 2 }] }]}
+        >
+          <View style={styles.chatIcon}>
+            <Icon name="chat" size={24} color={colors.textOnPrimary} />
+          </View>
+          <View style={{ flex: 1, gap: 3 }}>
+            <Text style={styles.chatTitle}>Describe it to AI</Text>
+            <Text style={styles.chatBody}>
+              Tell the AI what you want to learn, like vacation phrases in Spanish, and it builds the course for you.
+            </Text>
+          </View>
+          <Icon name="chevron" size={18} color={colors.textMuted} />
+        </Pressable>
+
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or build from your materials</Text>
+          <View style={styles.dividerLine} />
         </View>
 
-        <Heading>Add a resource</Heading>
-        <Muted>Give Cognify something to teach you. Notes, an article, a chapter — anything with words.</Muted>
-
-        {/* Mode switch */}
-        <View style={styles.segment}>
-          {(["paste", "file"] as const).map((m) => (
-            <Pressable
-              key={m}
-              onPress={() => setMode(m)}
-              style={[styles.segmentItem, mode === m && styles.segmentActive]}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: mode === m }}
-            >
-              <Icon name={m === "paste" ? "paste" : "upload"} size={18} color={mode === m ? colors.textOnPrimary : colors.textFaint} />
-              <Text style={[styles.segmentText, mode === m && { color: colors.textOnPrimary }]}>
-                {m === "paste" ? "Paste text" : "Upload file"}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
-        <Field label="Title">
+        <Field label="Course name (optional)">
           <TextInput
             value={title}
             onChangeText={setTitle}
@@ -103,29 +113,70 @@ export default function AddSourceScreen() {
           />
         </Field>
 
-        {mode === "paste" ? (
-          <Field label="Your material" hint={words ? `${words.toLocaleString()} words` : undefined}>
+        {/* Paste text and upload files, one section */}
+        <Field label="Your materials" hint={totalWords ? `${totalWords.toLocaleString()} words` : undefined}>
+          <View style={styles.materials}>
             <TextInput
-              value={content}
-              onChangeText={setContent}
+              value={pasted}
+              onChangeText={setPasted}
               placeholder="Paste notes, an article, a transcript…"
               placeholderTextColor={colors.textFaint}
               multiline
               textAlignVertical="top"
-              style={[styles.input, { minHeight: 180 }]}
+              style={styles.pasteInput}
+              accessibilityLabel="Paste text"
             />
-          </Field>
-        ) : (
-          <Pressable onPress={pickFile} style={styles.dropZone}>
-            <Icon name={fileName ? "doc" : "upload"} size={34} color={colors.primary} />
-            <Text style={styles.dropTitle}>{fileName ?? "Choose a file"}</Text>
-            <Muted style={{ textAlign: "center", fontSize: 13 }}>
-              {fileName ? `${words.toLocaleString()} words loaded · tap to replace` : ".txt, .md, .csv or .json for now — PDFs coming next"}
-            </Muted>
-          </Pressable>
-        )}
 
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+            {files.length > 0 ? (
+              <View style={styles.fileList}>
+                {files.map((f) => (
+                  <View key={f.id} style={styles.fileRow}>
+                    <Icon name={f.kind === "pdf" ? "pdf" : "doc"} size={20} color={colors.primary} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.fileName} numberOfLines={1}>
+                        {f.name}
+                      </Text>
+                      <Text style={styles.fileMeta}>
+                        {f.pages ? `${f.pages} page${f.pages === 1 ? "" : "s"} · ` : ""}
+                        {countWords(f.text).toLocaleString()} words
+                      </Text>
+                    </View>
+                    <Pressable
+                      accessibilityLabel={`Remove ${f.name}`}
+                      hitSlop={10}
+                      onPress={() => setFiles((prev) => prev.filter((x) => x.id !== f.id))}
+                    >
+                      <Icon name="close" size={18} color={colors.textFaint} />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            ) : null}
+
+            <Pressable
+              onPress={addFiles}
+              disabled={reading}
+              accessibilityRole="button"
+              style={({ pressed }) => [styles.addFiles, pressed && { opacity: 0.7 }]}
+            >
+              {reading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Icon name="attach" size={20} color={colors.primary} />
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={styles.addFilesTitle}>{reading ? "Reading files…" : "Add files"}</Text>
+                <Text style={styles.addFilesHint}>PDF, TXT or MD · pick as many as you like</Text>
+              </View>
+            </Pressable>
+          </View>
+        </Field>
+
+        {errors.map((e) => (
+          <Text key={e} style={styles.error}>
+            {e}
+          </Text>
+        ))}
 
         <Field label="What do you want to learn? (optional)">
           <TextInput
@@ -140,13 +191,13 @@ export default function AddSourceScreen() {
         <ChunkyButton
           label={busy ? "Building your course…" : "Create my course"}
           icon="sparkles"
-          disabled={!ready}
+          disabled={!ready || reading}
           loading={busy}
           onPress={submit}
           style={{ marginTop: 4 }}
         />
-        {!ready && content.length > 0 ? (
-          <Muted style={{ textAlign: "center", fontSize: 13 }}>Add a little more text to build lessons from.</Muted>
+        {!ready && pasted.length > 0 ? (
+          <Muted style={{ textAlign: "center", fontSize: 13 }}>Add a little more text, or a file, to build lessons from.</Muted>
         ) : null}
       </ScrollView>
     </KeyboardAvoidingView>
@@ -166,48 +217,74 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 }
 
 const styles = StyleSheet.create({
-  header: { flexDirection: "row", justifyContent: "flex-start" },
-  segment: {
+  chatCard: {
     flexDirection: "row",
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: 4,
-    gap: 4,
+    alignItems: "center",
+    gap: 14,
+    backgroundColor: colors.surfaceWarmLight,
+    borderWidth: 2,
+    borderColor: colors.surfaceWarm,
+    borderBottomWidth: 5,
+    borderBottomColor: colors.surfaceWarmEdge,
+    borderRadius: 20,
+    padding: 16,
   },
-  segmentItem: {
-    flex: 1,
-    flexDirection: "row",
-    gap: 8,
+  chatIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 12,
-    borderRadius: 12,
   },
-  segmentActive: { backgroundColor: colors.primary },
-  segmentText: { color: colors.textFaint, fontWeight: "800" },
+  chatTitle: { color: colors.text, fontSize: 17, fontWeight: "800" },
+  chatBody: { color: colors.textMuted, fontSize: 14, lineHeight: 19 },
+  dividerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  dividerLine: { flex: 1, height: 2, backgroundColor: colors.border },
+  dividerText: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
   label: { color: colors.text, fontWeight: "800", fontSize: 15 },
   hint: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
   input: {
     backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: colors.surfaceRaised,
+    borderColor: colors.border,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     color: colors.text,
     fontSize: 16,
   },
-  dropZone: {
-    borderWidth: 2,
-    borderStyle: "dashed",
-    borderColor: colors.secondary,
-    borderRadius: 20,
-    paddingVertical: 32,
-    paddingHorizontal: 20,
-    alignItems: "center",
-    gap: 8,
+  materials: {
     backgroundColor: colors.surface,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 18,
+    overflow: "hidden",
   },
-  dropTitle: { color: colors.text, fontWeight: "800", fontSize: 16 },
+  pasteInput: {
+    minHeight: 150,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
+    color: colors.text,
+    fontSize: 16,
+  },
+  fileList: { borderTopWidth: 2, borderTopColor: colors.border, paddingHorizontal: 12, paddingVertical: 6 },
+  fileRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, paddingHorizontal: 4 },
+  fileName: { color: colors.text, fontWeight: "700", fontSize: 15 },
+  fileMeta: { color: colors.textMuted, fontSize: 12, marginTop: 1 },
+  addFiles: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderTopWidth: 2,
+    borderTopColor: colors.border,
+    borderStyle: "dashed",
+    backgroundColor: colors.background,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  addFilesTitle: { color: colors.primary, fontWeight: "800", fontSize: 15 },
+  addFilesHint: { color: colors.textFaint, fontSize: 12, marginTop: 1 },
   error: { color: colors.wrong, fontWeight: "700" },
 });

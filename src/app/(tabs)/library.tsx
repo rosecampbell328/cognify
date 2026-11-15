@@ -25,7 +25,7 @@ export default function LibraryScreen() {
       {sources.length === 0 ? (
         <Card style={{ alignItems: "center", gap: 10, paddingVertical: 28 }}>
           <Icon name="doc" size={40} color={colors.secondaryShadow} />
-          <Muted style={{ textAlign: "center" }}>No resources yet. Paste some notes or upload a text file to get started.</Muted>
+          <Muted style={{ textAlign: "center" }}>No resources yet. Paste some notes or upload PDFs and text files to get started.</Muted>
         </Card>
       ) : (
         sources.map((s) => <SourceRow key={s.id} source={s} />)
@@ -42,7 +42,7 @@ function SourceRow({ source }: { source: Source }) {
     <Card style={{ gap: 12 }}>
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <View style={styles.iconBox}>
-          <Icon name={source.kind === "file" ? "doc" : "paste"} size={22} color={colors.primary} />
+          <Icon name={source.kind === "pdf" ? "pdf" : source.kind === "file" ? "doc" : "paste"} size={22} color={colors.primary} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={1}>

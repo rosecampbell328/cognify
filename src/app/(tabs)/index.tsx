@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Avatar } from "@/components/Avatar";
 import { Card, ChunkyButton, Heading, Icon, Muted, ProgressBar, StatPill } from "@/components/ui";
 import { courseProgress } from "@/lib/progress";
 import { SAMPLE_SOURCE } from "@/lib/sample";
@@ -13,6 +14,7 @@ export default function LearnScreen() {
   const insets = useSafeAreaInsets();
   const courses = useAppState((s) => s.courses);
   const progress = useAppState((s) => s.progress);
+  const profile = useAppState((s) => s.profile);
   const { create, busy } = useCreateCourse();
 
   const streak = liveStreak(progress);
@@ -33,11 +35,16 @@ export default function LearnScreen() {
         <Text style={styles.wordmark}>
           cogn<Text style={{ color: colors.xp }}>i</Text>fy
         </Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
+        <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
           <StatPill icon="flame" value={streak} color={streak > 0 ? colors.streak : colors.textFaint} />
           <StatPill icon="bolt" value={progress.xp} color={colors.xp} />
+          <Pressable onPress={() => router.navigate("/profile")} accessibilityRole="button" accessibilityLabel="Profile">
+            <Avatar name={profile.name} uri={profile.avatarUri} size={38} />
+          </Pressable>
         </View>
       </View>
+
+      <Text style={styles.greeting}>Hi, {profile.name.split(" ")[0]} 👋</Text>
 
       {/* Daily goal */}
       <Card style={{ gap: 12 }}>
@@ -102,16 +109,25 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
       <View style={styles.heroBubble}>
         <Icon name="brain" size={54} color={colors.primary} />
       </View>
-      <Heading style={{ textAlign: "center" }}>Learn anything you upload</Heading>
+      <Heading style={{ textAlign: "center" }}>Learn anything</Heading>
       <Muted style={{ textAlign: "center" }}>
-        Add notes, articles or documents. Cognify turns them into bite-sized lessons with quizzes,
-        flashcards and streaks.
+        Upload notes, articles or PDFs, or just tell the AI what you want to learn. Cognify turns it into
+        bite-sized lessons with quizzes, flashcards and streaks.
       </Muted>
       <ChunkyButton
         label="Upload a resource"
         icon="add"
         onPress={() => router.push("/add-source")}
         style={{ alignSelf: "stretch", marginTop: 6 }}
+      />
+      <ChunkyButton
+        label="Describe it to AI"
+        icon="chat"
+        color={colors.secondary}
+        shadowColor={colors.secondaryShadow}
+        textColor={colors.text}
+        onPress={() => router.push("/create-chat")}
+        style={{ alignSelf: "stretch" }}
       />
       <ChunkyButton
         label="Try a sample course"
@@ -127,6 +143,7 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
 
 const styles = StyleSheet.create({
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  greeting: { color: colors.text, fontSize: 22, fontWeight: "800", marginTop: -6 },
   wordmark: { color: colors.text, fontSize: 30, fontWeight: "900", letterSpacing: -1 },
   cardTitle: { color: colors.text, fontSize: 17, fontWeight: "800" },
   goalNumbers: { color: colors.text, fontWeight: "800", fontVariant: ["tabular-nums"] },
