@@ -1,11 +1,13 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod/v4";
 
+import { client, errorResponse, json, missingKeyResponse, MODEL } from "@/server/claude";
+
 /**
- * POST /api/generate — turns a learner's sources + goal into a bite-sized course.
- * Runs on the server (Expo Router API route), so ANTHROPIC_API_KEY never ships
- * inside the app bundle.
+ * POST /api/generate — builds a bite-sized course, either from the learner's
+ * sources or, with no sources, from a description of what they want to learn
+ * (the chat course builder). Runs on the server so ANTHROPIC_API_KEY never
+ * ships inside the app bundle.
  */
 
 const ExerciseSchema = z.object({
@@ -30,23 +32,21 @@ const CourseSchema = z.object({
   ),
 });
 
-const RequestSchema = z.object({
-  goal: z.string().max(500).default(""),
-  sources: z
-    .array(z.object({ title: z.string(), content: z.string() }))
-    .min(1),
-});
+const RequestSchema = z
+  .object({
+    goal: z.string().max(4000).default(""),
+    sources: z.array(z.object({ title: z.string(), content: z.string() })).default([]),
+  })
+  .refine((r) => r.sources.length > 0 || r.goal.trim().length > 0, {
+    message: "Send at least one source or a description of what to learn.",
+  });
 
 // ~ a few hundred pages of text. Larger uploads are rejected with a clear
 // message rather than silently cut short.
 const MAX_SOURCE_CHARS = 600_000;
 
-const SYSTEM_PROMPT = `You are Cognify's course designer. You turn a learner's own material into a short, game-like course in the style of Duolingo: many tiny lessons, each a quick run of interactive exercises.
-
-How to build the course:
-- Teach only what is supported by the provided sources. Do not introduce facts the sources don't contain.
-- Shape the course around the learner's goal when one is given; otherwise cover the most important ideas in the material.
-- Order lessons from foundational to advanced. Aim for 4–8 lessons with 5–7 exercises each, scaled to how much material there is.
+const SHARED_RULES = `Course shape:
+- Order lessons from foundational to advanced. Aim for 4–8 lessons with 5–7 exercises each.
 - Mix exercise types inside every lesson, and open each lesson with a flashcard that introduces its key idea.
 - Keep every prompt short enough to read on a phone in a few seconds.
 
@@ -61,9 +61,21 @@ Exercise rules (every field is required):
 
 Course fields: a concise "title", a single fitting emoji in "emoji", and a one-sentence "description".`;
 
-function json(body: unknown, status = 200) {
-  return Response.json(body, { status });
-}
+const FROM_SOURCES_PROMPT = `You are Cognify's course designer. You turn a learner's own material into a short, game-like course in the style of Duolingo: many tiny lessons, each a quick run of interactive exercises.
+
+- Teach only what is supported by the provided sources. Do not introduce facts the sources don't contain.
+- Shape the course around the learner's goal when one is given; otherwise cover the most important ideas in the material.
+- Size the course to how much material there is.
+
+${SHARED_RULES}`;
+
+const FROM_BRIEF_PROMPT = `You are Cognify's course designer. You build a short, game-like course in the style of Duolingo from a learner's description of what they want to learn: many tiny lessons, each a quick run of interactive exercises.
+
+- Teach accurate, well-established knowledge. Keep to what you are confident is correct; leave out anything uncertain.
+- Match the level, focus and context the learner describes (for example, a trip, an exam or a job).
+- For language courses, teach practical words and phrases with their meaning, build from single words to short phrases, and keep spelling and accents correct.
+
+${SHARED_RULES}`;
 
 /** Drop malformed exercises instead of failing the whole course. */
 function sanitize(course: z.infer<typeof CourseSchema>) {
@@ -81,13 +93,12 @@ function sanitize(course: z.infer<typeof CourseSchema>) {
 }
 
 export async function POST(request: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return json({ error: "no_api_key" }, 503);
-  }
+  const noKey = missingKeyResponse();
+  if (noKey) return noKey;
 
   const parsed = RequestSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return json({ error: "bad_request", message: "Send a goal and at least one source." }, 400);
+    return json({ error: "bad_request", message: "Send a goal or at least one source." }, 400);
   }
   const { goal, sources } = parsed.data;
 
@@ -102,15 +113,16 @@ export async function POST(request: Request) {
     );
   }
 
-  const sourceBlocks = sources
-    .map((s, i) => `<source index="${i + 1}" title="${s.title.replace(/"/g, "'")}">\n${s.content}\n</source>`)
-    .join("\n\n");
-
-  const client = new Anthropic();
+  const fromSources = sources.length > 0;
+  const userContent = fromSources
+    ? `${sources
+        .map((s, i) => `<source index="${i + 1}" title="${s.title.replace(/"/g, "'")}">\n${s.content}\n</source>`)
+        .join("\n\n")}\n\nLearner's goal: ${goal.trim() || "(none given — cover the key ideas)"}\n\nBuild the course.`
+    : `What the learner wants to learn:\n${goal.trim()}\n\nBuild the course.`;
 
   try {
-    const response = await client.beta.messages.parse({
-      model: "claude-opus-5-5",
+    const response = await client().beta.messages.parse({
+      model: MODEL,
       max_tokens: 16000,
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
@@ -118,17 +130,12 @@ export async function POST(request: Request) {
         effort: "medium",
         format: betaZodOutputFormat(CourseSchema),
       },
-      system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `${sourceBlocks}\n\nLearner's goal: ${goal.trim() || "(none given — cover the key ideas)"}\n\nBuild the course.`,
-        },
-      ],
+      system: fromSources ? FROM_SOURCES_PROMPT : FROM_BRIEF_PROMPT,
+      messages: [{ role: "user", content: userContent }],
     });
 
     if (response.stop_reason === "refusal") {
-      return json({ error: "refused", message: "the AI declined to build a course from this material" }, 422);
+      return json({ error: "refused", message: "the AI declined to build this course" }, 422);
     }
     if (response.stop_reason === "max_tokens" || !response.parsed_output) {
       return json({ error: "incomplete", message: "the course came back incomplete" }, 502);
@@ -140,15 +147,6 @@ export async function POST(request: Request) {
     }
     return json({ course });
   } catch (error) {
-    if (error instanceof Anthropic.AuthenticationError) {
-      return json({ error: "auth", message: "the server's API key was rejected" }, 502);
-    }
-    if (error instanceof Anthropic.RateLimitError) {
-      return json({ error: "rate_limited", message: "too many requests, try again shortly" }, 429);
-    }
-    if (error instanceof Anthropic.APIError) {
-      return json({ error: "api_error", message: `AI service error ${error.status ?? ""}`.trim() }, 502);
-    }
-    return json({ error: "unknown", message: "something went wrong" }, 500);
+    return errorResponse(error);
   }
 }

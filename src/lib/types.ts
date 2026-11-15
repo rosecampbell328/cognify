@@ -1,4 +1,4 @@
-export type SourceKind = "text" | "file";
+export type SourceKind = "text" | "file" | "pdf";
 
 /** Something the learner uploaded or pasted — the raw material for a course. */
 export type Source = {
@@ -62,7 +62,14 @@ export type Progress = {
   completed: Record<string, number>;
 };
 
+export type Profile = {
+  name: string;
+  /** Local file URI (native) or data URI (web); null shows initials. */
+  avatarUri: string | null;
+};
+
 export type AppState = {
+  profile: Profile;
   sources: Source[];
   courses: Course[];
   progress: Progress;

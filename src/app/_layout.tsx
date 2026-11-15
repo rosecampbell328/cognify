@@ -18,6 +18,7 @@ export default function RootLayout() {
         >
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="add-source" options={{ presentation: "modal" }} />
+          <Stack.Screen name="create-chat" options={{ presentation: "modal" }} />
           <Stack.Screen name="course/[id]" />
           <Stack.Screen
             name="lesson/[courseId]/[lessonId]"

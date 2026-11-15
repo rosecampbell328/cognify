@@ -1,8 +1,18 @@
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Avatar } from "@/components/Avatar";
 import { Card, Heading, Icon, IconName, Muted } from "@/components/ui";
-import { liveStreak, resetEverything, setDailyGoal, useAppState } from "@/lib/store";
+import { deleteAvatarFile, pickAvatar } from "@/lib/pickAvatar";
+import {
+  liveStreak,
+  resetEverything,
+  setAvatar,
+  setDailyGoal,
+  setProfileName,
+  useAppState,
+} from "@/lib/store";
 import { colors } from "@/theme/colors";
 
 const GOALS = [
@@ -36,6 +46,8 @@ export default function ProfileScreen() {
       contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: 40, paddingHorizontal: 18, gap: 16 }}
     >
       <Heading>Profile</Heading>
+
+      <ProfileHeader />
 
       <View style={styles.grid}>
         <Stat icon="flame" color={colors.streak} value={liveStreak(progress)} label="Day streak" />
@@ -71,6 +83,100 @@ export default function ProfileScreen() {
   );
 }
 
+function ProfileHeader() {
+  const profile = useAppState((s) => s.profile);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(profile.name);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+
+  async function choosePhoto() {
+    setPhotoError(null);
+    try {
+      const uri = await pickAvatar();
+      if (!uri) return;
+      deleteAvatarFile(profile.avatarUri);
+      setAvatar(uri);
+    } catch (e) {
+      setPhotoError(e instanceof Error ? e.message : "Couldn't use that photo.");
+    }
+  }
+
+  function removePhoto() {
+    deleteAvatarFile(profile.avatarUri);
+    setAvatar(null);
+  }
+
+  function onPhotoPress() {
+    if (!profile.avatarUri || Platform.OS === "web") {
+      choosePhoto();
+      return;
+    }
+    Alert.alert("Profile photo", undefined, [
+      { text: "Choose new photo", onPress: choosePhoto },
+      { text: "Remove photo", style: "destructive", onPress: removePhoto },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  }
+
+  function saveName() {
+    setProfileName(draft);
+    setEditing(false);
+  }
+
+  return (
+    <Card style={styles.profileCard}>
+      <Pressable
+        onPress={onPhotoPress}
+        accessibilityRole="button"
+        accessibilityLabel={profile.avatarUri ? "Change profile photo" : "Add profile photo"}
+      >
+        <Avatar name={profile.name} uri={profile.avatarUri} size={96} />
+        <View style={styles.cameraBadge}>
+          <Icon name="camera" size={16} color={colors.textOnPrimary} />
+        </View>
+      </Pressable>
+
+      {editing ? (
+        <View style={styles.nameEditRow}>
+          <TextInput
+            value={draft}
+            onChangeText={setDraft}
+            autoFocus
+            onSubmitEditing={saveName}
+            returnKeyType="done"
+            maxLength={40}
+            style={styles.nameInput}
+            accessibilityLabel="Your name"
+          />
+          <Pressable onPress={saveName} style={styles.saveButton} accessibilityRole="button">
+            <Text style={styles.saveText}>Save</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable
+          onPress={() => {
+            setDraft(profile.name);
+            setEditing(true);
+          }}
+          style={styles.nameRow}
+          accessibilityRole="button"
+          accessibilityLabel={`Name: ${profile.name}. Edit name`}
+        >
+          <Text style={styles.name}>{profile.name}</Text>
+          <Icon name="pencil" size={16} color={colors.textFaint} />
+        </Pressable>
+      )}
+
+      {profile.avatarUri && Platform.OS === "web" ? (
+        <Pressable onPress={removePhoto} hitSlop={8}>
+          <Text style={styles.removePhoto}>Remove photo</Text>
+        </Pressable>
+      ) : null}
+      {photoError ? <Text style={styles.photoError}>{photoError}</Text> : null}
+    </Card>
+  );
+}
+
 function Stat({ icon, color, value, label }: { icon: IconName; color: string; value: number; label: string }) {
   return (
     <Card style={styles.stat}>
@@ -82,6 +188,39 @@ function Stat({ icon, color, value, label }: { icon: IconName; color: string; va
 }
 
 const styles = StyleSheet.create({
+  profileCard: { alignItems: "center", gap: 12, paddingVertical: 24 },
+  cameraBadge: {
+    position: "absolute",
+    right: -2,
+    bottom: -2,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    borderWidth: 3,
+    borderColor: colors.surface,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  nameRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 4 },
+  name: { color: colors.text, fontSize: 24, fontWeight: "900" },
+  nameEditRow: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "stretch" },
+  nameInput: {
+    flex: 1,
+    backgroundColor: colors.background,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  saveButton: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12 },
+  saveText: { color: colors.textOnPrimary, fontWeight: "800" },
+  removePhoto: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
+  photoError: { color: colors.wrong, fontWeight: "700", textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
   statValue: { color: colors.text, fontSize: 26, fontWeight: "900", fontVariant: ["tabular-nums"] },

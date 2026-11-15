@@ -12,9 +12,11 @@ type ApiCourse = {
 };
 
 /**
- * Ask the server (src/app/api/generate+api.ts → Claude) to build a course.
- * Falls back to the on-device generator if the server has no API key or
- * can't be reached, so the app always works.
+ * Ask the server (src/app/api/generate+api.ts → Claude) to build a course from
+ * sources, or from a description alone when `sources` is empty (chat builder).
+ * With sources, falls back to the on-device generator if the server has no API
+ * key or can't be reached, so uploads always work. A description-only course
+ * needs the AI, so that case reports the problem instead.
  */
 export async function generateCourse(goal: string, sources: Source[]): Promise<GenerateResult> {
   const payload = {
@@ -22,7 +24,8 @@ export async function generateCourse(goal: string, sources: Source[]): Promise<G
     sources: sources.map((s) => ({ title: s.title, content: s.content })),
   };
 
-  let notice: string | undefined;
+  // Plain reason the AI couldn't build it; wording for each case is added below.
+  let problem: string;
   try {
     const res = await fetch("/api/generate", {
       method: "POST",
@@ -48,16 +51,20 @@ export async function generateCourse(goal: string, sources: Source[]): Promise<G
         },
       };
     }
-    notice =
+    problem =
       body?.error === "no_api_key"
-        ? "AI is not set up yet (no ANTHROPIC_API_KEY on the server), so this is a quick offline draft."
+        ? "AI is not set up yet (no ANTHROPIC_API_KEY on the server)"
         : body?.message
-          ? `AI couldn't build this one (${body.message}). Here's an offline draft instead.`
-          : "AI is unavailable right now, so this is a quick offline draft.";
+          ? `AI couldn't build this one (${body.message})`
+          : "AI is unavailable right now";
   } catch {
-    notice = "Couldn't reach the AI server, so this is a quick offline draft.";
+    problem = "Couldn't reach the AI server";
   }
 
+  if (sources.length === 0) {
+    throw new Error(`${problem}, and a course from a description needs the AI. Try again once it's available.`);
+  }
+  const notice = `${problem}, so this is a quick offline draft built from your material.`;
   const course = generateLocalCourse({ goal, sources });
   return { course, usedFallback: true, notice };
 }
