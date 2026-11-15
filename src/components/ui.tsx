@@ -81,7 +81,7 @@ export function ChunkyButton({
   onPress,
   color = colors.primary,
   shadowColor = colors.primaryShadow,
-  textColor = colors.text,
+  textColor = colors.textOnPrimary,
   icon,
   disabled,
   loading,
@@ -90,9 +90,9 @@ export function ChunkyButton({
 }: ButtonProps) {
   const outline = variant === "outline";
   const inactive = disabled || loading;
-  const face = inactive ? colors.locked : outline ? colors.surface : color;
-  const edge = inactive ? "#2e1240" : outline ? colors.border : shadowColor;
-  const fg = inactive ? colors.lockedText : outline ? colors.textMuted : textColor;
+  const face = inactive ? colors.locked : outline ? colors.background : color;
+  const edge = inactive ? colors.lockedEdge : outline ? colors.border : shadowColor;
+  const fg = inactive ? colors.lockedText : outline ? colors.primary : textColor;
 
   return (
     <Pressable
@@ -130,7 +130,7 @@ export function ChunkyButton({
 // ── Progress bar ────────────────────────────────────────
 export function ProgressBar({
   value,
-  color = colors.xp,
+  color = colors.progress,
   height = 14,
   style,
 }: {
@@ -144,7 +144,7 @@ export function ProgressBar({
     <View
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 0, max: 100, now: Math.round(pct * 100) }}
-      style={[{ height, borderRadius: height, backgroundColor: colors.surfaceRaised, overflow: "hidden" }, style]}
+      style={[{ height, borderRadius: height, backgroundColor: colors.progressTrack, overflow: "hidden" }, style]}
     >
       <View style={{ width: `${pct * 100}%`, height: "100%", borderRadius: height, backgroundColor: color }}>
         {/* glossy highlight */}
@@ -156,7 +156,7 @@ export function ProgressBar({
             right: 8,
             height: Math.max(3, height * 0.22),
             borderRadius: 4,
-            backgroundColor: "rgba(255,255,255,0.35)",
+            backgroundColor: "rgba(255,255,255,0.45)",
           }}
         />
       </View>
@@ -169,7 +169,7 @@ export function StatPill({ icon, value, color }: { icon: IconName; value: string
   return (
     <View style={styles.pill}>
       <Icon name={icon} size={18} color={color} />
-      <Text style={[styles.pillText, { color }]}>{value}</Text>
+      <Text style={styles.pillText}>{value}</Text>
     </View>
   );
 }
@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.surfaceRaised,
   },
-  pillText: { fontSize: 15, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  pillText: { color: colors.text, fontSize: 15, fontWeight: "800", fontVariant: ["tabular-nums"] },
   card: {
     backgroundColor: colors.surface,
     borderRadius: 22,

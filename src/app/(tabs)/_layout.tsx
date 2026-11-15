@@ -11,12 +11,12 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: colors.background },
-        tabBarActiveTintColor: colors.xp,
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textFaint,
         tabBarLabelStyle: { fontWeight: "800", fontSize: 11, lineHeight: 14, letterSpacing: 0.4 },
         tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.surfaceRaised,
+          backgroundColor: colors.background,
+          borderTopColor: colors.border,
           // Room for the bold label, plus the home-indicator area on notched phones.
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,

@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Card, Heading, Icon, IconName, Muted } from "@/components/ui";
 import { liveStreak, resetEverything, setDailyGoal, useAppState } from "@/lib/store";
-import { colors, palette } from "@/theme/colors";
+import { colors } from "@/theme/colors";
 
 const GOALS = [
   { xp: 10, label: "Casual" },
@@ -40,8 +40,8 @@ export default function ProfileScreen() {
       <View style={styles.grid}>
         <Stat icon="flame" color={colors.streak} value={liveStreak(progress)} label="Day streak" />
         <Stat icon="bolt" color={colors.xp} value={progress.xp} label="Total XP" />
-        <Stat icon="trophy" color={palette.frozenLake} value={lessonsDone} label="Lessons done" />
-        <Stat icon="school" color={palette.brightLavender} value={courseCount} label="Courses" />
+        <Stat icon="trophy" color={colors.xp} value={lessonsDone} label="Lessons done" />
+        <Stat icon="school" color={colors.primary} value={courseCount} label="Courses" />
       </View>
 
       <Card style={{ gap: 12 }}>
@@ -55,9 +55,9 @@ export default function ProfileScreen() {
               onPress={() => setDailyGoal(g.xp)}
               accessibilityRole="radio"
               accessibilityState={{ selected: active }}
-              style={[styles.goalRow, active && { borderColor: colors.xp, backgroundColor: colors.surfaceRaised }]}
+              style={[styles.goalRow, active && { borderColor: colors.primary, backgroundColor: colors.background }]}
             >
-              <Text style={[styles.goalLabel, active && { color: colors.xp }]}>{g.label}</Text>
+              <Text style={[styles.goalLabel, active && { color: colors.primary }]}>{g.label}</Text>
               <Text style={styles.goalXp}>{g.xp} XP / day</Text>
             </Pressable>
           );

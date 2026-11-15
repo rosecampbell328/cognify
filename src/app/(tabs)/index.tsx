@@ -7,7 +7,7 @@ import { courseProgress } from "@/lib/progress";
 import { SAMPLE_SOURCE } from "@/lib/sample";
 import { addSource, liveStreak, liveTodayXp, useAppState } from "@/lib/store";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { accentFor, colors, palette } from "@/theme/colors";
+import { accentFor, colors } from "@/theme/colors";
 
 export default function LearnScreen() {
   const insets = useSafeAreaInsets();
@@ -47,7 +47,7 @@ export default function LearnScreen() {
             {Math.min(todayXp, progress.dailyGoal)} / {progress.dailyGoal} XP
           </Text>
         </View>
-        <ProgressBar value={todayXp / progress.dailyGoal} />
+        <ProgressBar value={todayXp / progress.dailyGoal} color={colors.xp} />
         <Muted>
           {todayXp >= progress.dailyGoal
             ? "Goal smashed! Keep the streak alive tomorrow. 🎉"
@@ -72,7 +72,7 @@ export default function LearnScreen() {
               <Pressable
                 key={course.id}
                 onPress={() => router.push({ pathname: "/course/[id]", params: { id: course.id } })}
-                style={({ pressed }) => [styles.courseCard, { borderColor: accent.shadow, opacity: pressed ? 0.85 : 1 }]}
+                style={({ pressed }) => [styles.courseCard, { borderBottomColor: accent.fill, opacity: pressed ? 0.85 : 1 }]}
               >
                 <View style={[styles.courseEmoji, { backgroundColor: accent.fill, borderBottomColor: accent.shadow }]}>
                   <Text style={{ fontSize: 30 }}>{course.emoji}</Text>
@@ -84,7 +84,7 @@ export default function LearnScreen() {
                   <Text style={styles.courseMeta}>
                     {cp.done}/{cp.total} lessons{course.generatedBy === "offline" ? " · offline draft" : ""}
                   </Text>
-                  <ProgressBar value={cp.fraction} color={accent.fill} height={10} />
+                  <ProgressBar value={cp.fraction} height={10} />
                 </View>
                 <Icon name="chevron" size={18} color={colors.textFaint} />
               </Pressable>
@@ -100,7 +100,7 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
   return (
     <Card style={{ alignItems: "center", gap: 14, paddingVertical: 28 }}>
       <View style={styles.heroBubble}>
-        <Icon name="brain" size={54} color={palette.royalGold} />
+        <Icon name="brain" size={54} color={colors.primary} />
       </View>
       <Heading style={{ textAlign: "center" }}>Learn anything you upload</Heading>
       <Muted style={{ textAlign: "center" }}>
@@ -129,9 +129,9 @@ const styles = StyleSheet.create({
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   wordmark: { color: colors.text, fontSize: 30, fontWeight: "900", letterSpacing: -1 },
   cardTitle: { color: colors.text, fontSize: 17, fontWeight: "800" },
-  goalNumbers: { color: colors.xp, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  goalNumbers: { color: colors.text, fontWeight: "800", fontVariant: ["tabular-nums"] },
   sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 },
-  link: { color: colors.xp, fontWeight: "800", fontSize: 15 },
+  link: { color: colors.primary, fontWeight: "800", fontSize: 15 },
   courseCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderRadius: 22,
     borderWidth: 2,
+    borderColor: colors.border,
     borderBottomWidth: 5,
     padding: 14,
   },
@@ -156,9 +157,9 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: colors.surfaceRaised,
+    backgroundColor: colors.background,
     borderWidth: 3,
-    borderColor: palette.violetTwilight,
+    borderColor: colors.secondary,
     alignItems: "center",
     justifyContent: "center",
   },
