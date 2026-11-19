@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
   topRow: { flexDirection: "row", alignItems: "center", gap: 16, paddingHorizontal: 20 },
   retryTag: { backgroundColor: colors.wrongBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
   retryText: { color: colors.wrong, fontWeight: "700", fontSize: 12 },
-  prompt: { color: colors.text, fontFamily: fonts.serifMedium, fontSize: 24, lineHeight: 32 },
+  prompt: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 24, lineHeight: 32 },
   option: {
     flexDirection: "row",
     alignItems: "center",
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 6,
   },
-  feedbackTitle: { fontFamily: fonts.serif, fontSize: 19 },
+  feedbackTitle: { fontFamily: fonts.display, fontSize: 19 },
   feedbackBody: { color: colors.text, fontSize: 15, lineHeight: 21 },
   card: {
     minHeight: 240,
@@ -323,8 +323,8 @@ const styles = StyleSheet.create({
     gap: 16,
     justifyContent: "center",
   },
-  cardFront: { color: colors.text, fontFamily: fonts.serif, fontSize: 28, lineHeight: 35 },
-  cardHint: { color: colors.textFaint, fontSize: 14, fontStyle: "italic" },
+  cardFront: { color: colors.text, fontFamily: fonts.display, fontSize: 28, lineHeight: 35 },
+  cardHint: { color: colors.textFaint, fontSize: 14 },
   cardBackWrap: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, gap: 6 },
   cardBack: { color: colors.text, fontSize: 18, lineHeight: 26 },
   resultMark: {
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  resultTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 34, letterSpacing: -0.4 },
+  resultTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 34, letterSpacing: -0.4 },
   summary: {
     flexDirection: "row",
     alignSelf: "stretch",
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   },
   summaryCell: { flex: 1, alignItems: "center", gap: 4 },
   summaryDivider: { width: 1, backgroundColor: colors.border },
-  summaryValue: { color: colors.text, fontFamily: fonts.serif, fontSize: 32, fontVariant: ["tabular-nums"] },
+  summaryValue: { color: colors.text, fontFamily: fonts.display, fontSize: 32, fontVariant: ["tabular-nums"] },
   summaryLabelRow: { flexDirection: "row", alignItems: "center", gap: 5 },
   summaryLabel: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
 });

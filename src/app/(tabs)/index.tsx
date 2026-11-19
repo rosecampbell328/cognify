@@ -178,8 +178,8 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
 
 const styles = StyleSheet.create({
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  greeting: { color: colors.text, fontFamily: fonts.serif, fontSize: 28, letterSpacing: -0.3, marginTop: -4 },
-  wordmark: { color: colors.primary, fontFamily: fonts.serif, fontSize: 26, letterSpacing: -0.5 },
+  greeting: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3, marginTop: -4 },
+  wordmark: { color: colors.primary, fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
   goalNumbers: { color: colors.text, fontWeight: "700", fontVariant: ["tabular-nums"] },
   sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 },
   link: { color: colors.primary, fontWeight: "700", fontSize: 15 },
@@ -203,9 +203,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  courseTitle: { color: colors.text, fontFamily: fonts.serifMedium, fontSize: 18, lineHeight: 23 },
+  courseTitle: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 18, lineHeight: 23 },
   resumeCard: { backgroundColor: colors.background, borderColor: colors.primary, borderWidth: 1.5, boxShadow: colors.liftShadow, gap: 4 },
-  resumeTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 24, lineHeight: 30, marginTop: 2 },
+  resumeTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 24, lineHeight: 30, marginTop: 2 },
   resumeMeta: { color: colors.textMuted, fontSize: 14 },
   courseMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
   heroBubble: {

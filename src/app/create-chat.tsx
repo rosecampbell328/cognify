@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  headerTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 19 },
+  headerTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
   bubble: { maxWidth: "85%", borderRadius: 20, paddingHorizontal: 16, paddingVertical: 11 },
   aiBubble: {
     alignSelf: "flex-start",
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   planEyebrow: { color: colors.primaryShadow, fontWeight: "700", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase" },
-  planTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 22, lineHeight: 28 },
+  planTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
   planBrief: { color: colors.textMuted, fontSize: 14, lineHeight: 20 },
   planHint: { color: colors.textFaint, fontSize: 13, textAlign: "center" },
   composer: {

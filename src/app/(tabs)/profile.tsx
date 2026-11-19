@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   nameRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 4 },
-  name: { color: colors.text, fontFamily: fonts.serif, fontSize: 28, letterSpacing: -0.3 },
+  name: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3 },
   nameEditRow: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "stretch" },
   nameInput: {
     flex: 1,
@@ -224,9 +224,9 @@ const styles = StyleSheet.create({
   photoError: { color: colors.wrong, fontWeight: "700", textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
-  statValue: { color: colors.text, fontFamily: fonts.serif, fontSize: 30, fontVariant: ["tabular-nums"] },
+  statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 30, fontVariant: ["tabular-nums"] },
   statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "700" },
-  cardTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 20 },
+  cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
   goalRow: {
     flexDirection: "row",
     justifyContent: "space-between",

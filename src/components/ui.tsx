@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: 18,
   },
-  heading: { color: colors.text, fontSize: 30, fontFamily: fonts.serif, letterSpacing: -0.4 },
+  heading: { color: colors.text, fontSize: 30, fontFamily: fonts.display, letterSpacing: -0.4 },
   muted: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
   eyebrow: { color: colors.textMuted, fontSize: 12, fontWeight: "700", letterSpacing: 1.2, textTransform: "uppercase" },
 });

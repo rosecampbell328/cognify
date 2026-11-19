@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  chatTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 19 },
+  chatTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
   chatBody: { color: colors.textMuted, fontSize: 14, lineHeight: 19 },
   dividerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   dividerLine: { flex: 1, height: 2, backgroundColor: colors.border },
