@@ -2,11 +2,12 @@ import { router } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Card, ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
+import { Card, Button, Heading, Icon, Muted } from "@/components/ui";
 import { removeSource, useAppState } from "@/lib/store";
 import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
 import { colors } from "@/theme/colors";
+import { fonts } from "@/theme/type";
 
 export default function LibraryScreen() {
   const insets = useSafeAreaInsets();
@@ -20,7 +21,7 @@ export default function LibraryScreen() {
       <Heading>Library</Heading>
       <Muted>Everything you’ve uploaded. Turn any resource into a new course.</Muted>
 
-      <ChunkyButton label="Add resource" icon="add" onPress={() => router.push("/add-source")} />
+      <Button label="Add resource" icon="add" onPress={() => router.push("/add-source")} />
 
       {sources.length === 0 ? (
         <Card style={{ alignItems: "center", gap: 10, paddingVertical: 28 }}>
@@ -63,11 +64,10 @@ function SourceRow({ source }: { source: Source }) {
       <Text style={styles.preview} numberOfLines={3}>
         {source.content.trim()}
       </Text>
-      <ChunkyButton
+      <Button
         label="Make a course"
         icon="sparkles"
         color={colors.secondary}
-        shadowColor={colors.secondaryShadow}
         textColor={colors.text}
         loading={busy}
         onPress={() => create("", [source])}
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  title: { color: colors.text, fontSize: 16, fontWeight: "800" },
+  title: { color: colors.text, fontFamily: fonts.serifMedium, fontSize: 17 },
   meta: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
   preview: { color: colors.textFaint, fontSize: 14, lineHeight: 20 },
 });

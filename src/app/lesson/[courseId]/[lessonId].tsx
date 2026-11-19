@@ -1,22 +1,23 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeIn, SlideInDown, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChunkyButton, Icon, Muted, ProgressBar } from "@/components/ui";
+import { Button, Eyebrow, Icon, Muted, ProgressBar } from "@/components/ui";
 import { xpForLesson } from "@/lib/progress";
 import { completeLesson, useAppState } from "@/lib/store";
 import type { Exercise } from "@/lib/types";
 import { colors } from "@/theme/colors";
+import { fonts } from "@/theme/type";
 
 type QueueItem = { exercise: Exercise; retry: boolean; key: string };
 
 const TYPE_LABEL: Record<Exercise["type"], string> = {
-  multiple_choice: "Choose the right answer",
-  true_false: "True or false?",
-  fill_blank: "Fill in the blank",
-  flashcard: "New card",
+  multiple_choice: "Choose one",
+  true_false: "True or false",
+  fill_blank: "Fill the gap",
+  flashcard: "Key idea",
 };
 
 export default function LessonScreen() {
@@ -100,12 +101,12 @@ export default function LessonScreen() {
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 20 }} key={item.key}>
         <Animated.View entering={FadeIn.duration(250)} style={{ gap: 18 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <Eyebrow>{TYPE_LABEL[ex.type]}</Eyebrow>
             {item.retry ? (
               <View style={styles.retryTag}>
-                <Text style={styles.retryText}>PREVIOUS MISTAKE</Text>
+                <Text style={styles.retryText}>Let’s try this again</Text>
               </View>
             ) : null}
-            <Text style={styles.typeLabel}>{TYPE_LABEL[ex.type]}</Text>
           </View>
 
           {ex.type === "flashcard" ? (
@@ -113,7 +114,7 @@ export default function LessonScreen() {
           ) : (
             <>
               <Text style={styles.prompt}>{ex.prompt}</Text>
-              <View style={{ gap: 12 }}>
+              <View style={{ gap: 10 }}>
                 {ex.options.map((opt, i) => (
                   <Option
                     key={i}
@@ -133,70 +134,45 @@ export default function LessonScreen() {
       </ScrollView>
 
       {/* Bottom action area */}
-      {ex.type === "flashcard" ? (
-        <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
-          {flipped ? (
-            <View style={{ flexDirection: "row", gap: 12 }}>
-              <ChunkyButton
-                label="Still learning"
-                variant="outline"
-                onPress={() => advance(false)}
-                style={{ flex: 1 }}
-              />
-              <ChunkyButton
-                label="Got it"
-                color={colors.correct}
-                shadowColor={colors.correctShadow}
-                textColor={colors.textOnPrimary}
-                onPress={() => advance(true)}
-                style={{ flex: 1 }}
-              />
+      <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
+        {ex.type === "flashcard" ? (
+          flipped ? (
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Button label="Still learning" variant="outline" onPress={() => advance(false)} style={{ flex: 1 }} />
+              <Button label="Got it" icon="check" onPress={() => advance(true)} style={{ flex: 1 }} />
             </View>
           ) : (
-            <ChunkyButton label="Flip card" icon="cards" onPress={() => setFlipped(true)} />
-          )}
-        </View>
-      ) : checked ? (
-        <Animated.View
-          entering={SlideInDown.duration(220)}
-          style={[
-            styles.feedback,
-            { backgroundColor: isCorrect ? colors.correctBg : colors.wrongBg, paddingBottom: insets.bottom + 16 },
-          ]}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-            <View style={[styles.feedbackIcon, { backgroundColor: isCorrect ? colors.correct : colors.wrong }]}>
-              <Icon name={isCorrect ? "check" : "close"} size={20} color={colors.textOnPrimary} />
+            <Button label="Reveal answer" icon="cards" onPress={() => setFlipped(true)} />
+          )
+        ) : checked ? (
+          <Animated.View entering={FadeInDown.duration(220)} style={{ gap: 12 }}>
+            <View style={[styles.feedback, { borderLeftColor: isCorrect ? colors.correct : colors.wrong }]}>
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <Icon name={isCorrect ? "check" : "close"} size={18} color={isCorrect ? colors.correct : colors.wrong} />
+                <Text style={[styles.feedbackTitle, { color: isCorrect ? colors.correct : colors.wrong }]}>
+                  {isCorrect ? pick(PRAISE) : "Not quite"}
+                </Text>
+              </View>
+              {!isCorrect ? (
+                <Text style={styles.feedbackBody}>
+                  The answer is <Text style={{ fontWeight: "700" }}>{ex.options[ex.correctIndex]}</Text>.
+                </Text>
+              ) : null}
+              {ex.explanation ? <Text style={styles.feedbackBody}>{ex.explanation}</Text> : null}
             </View>
-            <Text style={[styles.feedbackTitle, { color: isCorrect ? colors.correct : colors.wrong }]}>
-              {isCorrect ? pick(PRAISE) : "Not quite"}
-            </Text>
-          </View>
-          {!isCorrect ? (
-            <Text style={styles.feedbackBody}>
-              Correct answer: <Text style={{ fontWeight: "900" }}>{ex.options[ex.correctIndex]}</Text>
-            </Text>
-          ) : null}
-          {ex.explanation ? <Text style={styles.feedbackBody}>{ex.explanation}</Text> : null}
-          <ChunkyButton
-            label="Continue"
-            color={isCorrect ? colors.correct : colors.wrong}
-            shadowColor={isCorrect ? colors.correctShadow : colors.wrongShadow}
-            textColor={colors.textOnPrimary}
-            onPress={() => advance(isCorrect)}
-          />
-        </Animated.View>
-      ) : (
-        <View style={[styles.footer, { paddingBottom: insets.bottom + 16 }]}>
-          <ChunkyButton label="Check" disabled={selected === null} onPress={() => setChecked(true)} />
-        </View>
-      )}
+            <Button label="Continue" onPress={() => advance(isCorrect)} />
+          </Animated.View>
+        ) : (
+          <Button label="Check answer" disabled={selected === null} onPress={() => setChecked(true)} />
+        )}
+      </View>
     </View>
   );
 }
 
-const PRAISE = ["Nice!", "Great job!", "Correct!", "You got it!", "Brilliant!"];
+const PRAISE = ["Correct", "Exactly right", "Well done", "That's it", "Spot on"];
 const pick = <T,>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
 function Option({
   label,
@@ -211,9 +187,11 @@ function Option({
   state: "idle" | "correct" | "wrong" | "dim";
   onPress: () => void;
 }) {
-  const border =
+  const accent =
     state === "correct" ? colors.correct : state === "wrong" ? colors.wrong : selected ? colors.primary : colors.border;
-  const bg = state === "correct" ? colors.correctBg : state === "wrong" ? colors.wrongBg : selected ? colors.surfaceRaised : colors.surface;
+  const bg =
+    state === "correct" ? colors.correctBg : state === "wrong" ? colors.wrongBg : selected ? colors.surface : colors.background;
+  const keyFilled = selected || state === "correct" || state === "wrong";
 
   return (
     <Pressable
@@ -222,29 +200,33 @@ function Option({
       accessibilityState={{ selected }}
       style={({ pressed }) => [
         styles.option,
-        { borderColor: border, backgroundColor: bg, opacity: state === "dim" ? 0.5 : 1 },
-        pressed && state === "idle" && { transform: [{ translateY: 2 }] },
+        { borderColor: accent, backgroundColor: bg, opacity: state === "dim" ? 0.45 : pressed && state === "idle" ? 0.8 : 1 },
       ]}
     >
-      <View style={[styles.optionKey, { borderColor: border }]}>
-        <Text style={styles.optionKeyText}>{index + 1}</Text>
+      <View style={[styles.optionKey, keyFilled ? { backgroundColor: accent, borderColor: accent } : { borderColor: colors.border }]}>
+        <Text style={[styles.optionKeyText, keyFilled && { color: colors.textOnPrimary }]}>{LETTERS[index] ?? index + 1}</Text>
       </View>
       <Text style={styles.optionText}>{label}</Text>
+      {state === "correct" || state === "wrong" ? (
+        <Icon name={state === "correct" ? "check" : "close"} size={18} color={accent} />
+      ) : null}
     </Pressable>
   );
 }
 
 function Flashcard({ exercise, flipped, onFlip }: { exercise: Exercise; flipped: boolean; onFlip: () => void }) {
   return (
-    <Pressable onPress={onFlip} accessibilityRole="button" accessibilityHint="Flips the card">
-      <View style={[styles.card, flipped && { backgroundColor: colors.surfaceWarmLight, borderColor: colors.surfaceWarm }]}>
-        <Text style={styles.cardEyebrow}>{flipped ? "ANSWER" : "TAP TO REVEAL"}</Text>
+    <Pressable onPress={onFlip} accessibilityRole="button" accessibilityHint="Reveals the answer">
+      <View style={styles.card}>
         <Text style={styles.cardFront}>{exercise.prompt}</Text>
         {flipped ? (
-          <Animated.View entering={FadeIn.duration(250)} style={styles.cardDivider}>
+          <Animated.View entering={FadeIn.duration(250)} style={styles.cardBackWrap}>
+            <Eyebrow>Answer</Eyebrow>
             <Text style={styles.cardBack}>{exercise.back}</Text>
           </Animated.View>
-        ) : null}
+        ) : (
+          <Text style={styles.cardHint}>Think of the answer, then reveal it.</Text>
+        )}
       </View>
     </Pressable>
   );
@@ -253,35 +235,38 @@ function Flashcard({ exercise, flipped, onFlip }: { exercise: Exercise; flipped:
 function Results({ xp, accuracy, title }: { xp: number; accuracy: number; title: string }) {
   const insets = useSafeAreaInsets();
   const pct = Math.round(accuracy * 100);
+  const note =
+    pct >= 90 ? "Excellent recall." : pct >= 70 ? "Solid work. A quick review will lock it in." : "Good effort. Practising this again will help it stick.";
   return (
-    <View style={[styles.center, { padding: 24, paddingBottom: insets.bottom + 24, gap: 18 }]}>
-      <Animated.View entering={ZoomIn.springify()} style={styles.resultBadge}>
-        <Icon name="trophy" size={64} color={colors.xp} />
-      </Animated.View>
-      <Text style={styles.resultTitle}>Lesson complete!</Text>
-      <Muted style={{ textAlign: "center" }}>{title}</Muted>
-      <View style={{ flexDirection: "row", gap: 12, alignSelf: "stretch" }}>
-        <ResultTile label="XP EARNED" value={`+${xp}`} color={colors.xp} icon="bolt" />
-        <ResultTile
-          label="ACCURACY"
-          value={`${pct}%`}
-          color={pct >= 80 ? colors.correct : colors.secondary}
-          icon="star"
-        />
-      </View>
-      <ChunkyButton label="Continue" onPress={() => router.back()} style={{ alignSelf: "stretch", marginTop: 12 }} />
-    </View>
-  );
-}
+    <View style={[styles.center, { padding: 24, paddingBottom: insets.bottom + 24 }]}>
+      <Animated.View entering={FadeInDown.duration(350)} style={{ alignSelf: "stretch", alignItems: "center", gap: 10 }}>
+        <View style={styles.resultMark}>
+          <Icon name="check" size={28} color={colors.textOnPrimary} />
+        </View>
+        <Eyebrow style={{ marginTop: 8 }}>{title}</Eyebrow>
+        <Text style={styles.resultTitle}>Lesson complete</Text>
+        <Muted style={{ textAlign: "center" }}>{note}</Muted>
 
-function ResultTile({ label, value, color, icon }: { label: string; value: string; color: string; icon: "bolt" | "star" }) {
-  return (
-    <View style={[styles.tile, { borderColor: color }]}>
-      <Text style={[styles.tileLabel, { backgroundColor: color }]}>{label}</Text>
-      <View style={styles.tileBody}>
-        <Icon name={icon} size={22} color={color} />
-        <Text style={styles.tileValue}>{value}</Text>
-      </View>
+        <View style={styles.summary}>
+          <View style={styles.summaryCell}>
+            <Text style={styles.summaryValue}>+{xp}</Text>
+            <View style={styles.summaryLabelRow}>
+              <Icon name="bolt" size={14} color={colors.xp} />
+              <Text style={styles.summaryLabel}>XP earned</Text>
+            </View>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryCell}>
+            <Text style={styles.summaryValue}>{pct}%</Text>
+            <View style={styles.summaryLabelRow}>
+              <Icon name="star" size={14} color={pct >= 80 ? colors.correct : colors.secondaryShadow} />
+              <Text style={styles.summaryLabel}>Accuracy</Text>
+            </View>
+          </View>
+        </View>
+
+        <Button label="Continue" onPress={() => router.back()} style={{ alignSelf: "stretch", marginTop: 16 }} />
+      </Animated.View>
     </View>
   );
 }
@@ -289,75 +274,81 @@ function ResultTile({ label, value, color, icon }: { label: string; value: strin
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: "center", justifyContent: "center" },
   topRow: { flexDirection: "row", alignItems: "center", gap: 16, paddingHorizontal: 20 },
-  typeLabel: { color: colors.textMuted, fontWeight: "800", fontSize: 15 },
-  retryTag: { backgroundColor: colors.wrongBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-  retryText: { color: colors.wrong, fontWeight: "900", fontSize: 11, letterSpacing: 0.8 },
-  prompt: { color: colors.text, fontSize: 22, fontWeight: "800", lineHeight: 30 },
+  retryTag: { backgroundColor: colors.wrongBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+  retryText: { color: colors.wrong, fontWeight: "700", fontSize: 12 },
+  prompt: { color: colors.text, fontFamily: fonts.serifMedium, fontSize: 24, lineHeight: 32 },
   option: {
     flexDirection: "row",
     alignItems: "center",
     gap: 14,
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderRadius: 18,
+    borderWidth: 1.5,
+    borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 14,
   },
   optionKey: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    borderWidth: 2,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1.5,
     alignItems: "center",
     justifyContent: "center",
   },
-  optionKeyText: { color: colors.textMuted, fontWeight: "800", fontSize: 13 },
-  optionText: { flex: 1, color: colors.text, fontSize: 17, fontWeight: "700", lineHeight: 23 },
+  optionKeyText: { color: colors.textMuted, fontWeight: "700", fontSize: 13 },
+  optionText: { flex: 1, color: colors.text, fontSize: 17, lineHeight: 23 },
   footer: {
     paddingHorizontal: 20,
     paddingTop: 14,
-    borderTopWidth: 2,
+    borderTopWidth: 1,
     borderTopColor: colors.border,
+    backgroundColor: colors.background,
   },
-  feedback: { paddingHorizontal: 20, paddingTop: 18, gap: 12, borderTopLeftRadius: 24, borderTopRightRadius: 24 },
-  feedbackIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
-  feedbackTitle: { fontSize: 22, fontWeight: "900" },
+  feedback: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    gap: 6,
+  },
+  feedbackTitle: { fontFamily: fonts.serif, fontSize: 19 },
   feedbackBody: { color: colors.text, fontSize: 15, lineHeight: 21 },
   card: {
-    minHeight: 260,
-    borderRadius: 26,
-    borderWidth: 2,
-    borderBottomWidth: 6,
-    borderColor: colors.secondary,
+    minHeight: 240,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
     backgroundColor: colors.surface,
     padding: 24,
-    gap: 14,
+    gap: 16,
     justifyContent: "center",
   },
-  cardEyebrow: { color: colors.primary, fontWeight: "900", letterSpacing: 1.2, fontSize: 12 },
-  cardFront: { color: colors.text, fontSize: 24, fontWeight: "900", lineHeight: 31 },
-  cardDivider: { borderTopWidth: 2, borderTopColor: colors.border, paddingTop: 14 },
-  cardBack: { color: colors.text, fontSize: 18, fontWeight: "600", lineHeight: 26 },
-  resultBadge: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    backgroundColor: colors.surface,
-    borderWidth: 4,
-    borderColor: colors.xp,
+  cardFront: { color: colors.text, fontFamily: fonts.serif, fontSize: 28, lineHeight: 35 },
+  cardHint: { color: colors.textFaint, fontSize: 14, fontStyle: "italic" },
+  cardBackWrap: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, gap: 6 },
+  cardBack: { color: colors.text, fontSize: 18, lineHeight: 26 },
+  resultMark: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.correct,
     alignItems: "center",
     justifyContent: "center",
   },
-  resultTitle: { color: colors.text, fontSize: 30, fontWeight: "900" },
-  tile: { flex: 1, borderWidth: 2, borderRadius: 18, overflow: "hidden" },
-  tileLabel: {
-    color: colors.text,
-    fontWeight: "900",
-    fontSize: 12,
-    letterSpacing: 1,
-    textAlign: "center",
-    paddingVertical: 6,
+  resultTitle: { color: colors.text, fontFamily: fonts.serif, fontSize: 34, letterSpacing: -0.4 },
+  summary: {
+    flexDirection: "row",
+    alignSelf: "stretch",
+    marginTop: 18,
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 18,
   },
-  tileBody: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 16 },
-  tileValue: { color: colors.text, fontSize: 24, fontWeight: "900", fontVariant: ["tabular-nums"] },
+  summaryCell: { flex: 1, alignItems: "center", gap: 4 },
+  summaryDivider: { width: 1, backgroundColor: colors.border },
+  summaryValue: { color: colors.text, fontFamily: fonts.serif, fontSize: 32, fontVariant: ["tabular-nums"] },
+  summaryLabelRow: { flexDirection: "row", alignItems: "center", gap: 5 },
+  summaryLabel: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
 });

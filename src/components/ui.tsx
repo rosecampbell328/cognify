@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import { colors } from "@/theme/colors";
+import { fonts } from "@/theme/type";
 
 // ── Icons ───────────────────────────────────────────────
 // One name → SF Symbol on iOS, Material Symbol on Android/web.
@@ -66,29 +67,29 @@ export function Icon({ name, size = 22, color = colors.text }: { name: IconName;
   );
 }
 
-// ── Chunky 3D button ────────────────────────────────────
+// ── Button ──────────────────────────────────────────────
+// Flat and soft: a gentle lift shadow, sentence-case label, slight press dip.
 type ButtonProps = {
   label: string;
   onPress?: () => void;
   color?: string;
-  shadowColor?: string;
   textColor?: string;
   icon?: IconName;
+  /** Put the icon after the label (e.g. a forward arrow). */
+  iconAfter?: boolean;
   disabled?: boolean;
   loading?: boolean;
   variant?: "solid" | "outline";
   style?: StyleProp<ViewStyle>;
 };
 
-const DEPTH = 5;
-
-export function ChunkyButton({
+export function Button({
   label,
   onPress,
   color = colors.primary,
-  shadowColor = colors.primaryShadow,
   textColor = colors.textOnPrimary,
   icon,
+  iconAfter,
   disabled,
   loading,
   variant = "solid",
@@ -96,8 +97,7 @@ export function ChunkyButton({
 }: ButtonProps) {
   const outline = variant === "outline";
   const inactive = disabled || loading;
-  const face = inactive ? colors.locked : outline ? colors.background : color;
-  const edge = inactive ? colors.lockedEdge : outline ? colors.border : shadowColor;
+  const bg = inactive ? colors.locked : outline ? "transparent" : color;
   const fg = inactive ? colors.lockedText : outline ? colors.primary : textColor;
 
   return (
@@ -106,28 +106,26 @@ export function ChunkyButton({
       accessibilityState={{ disabled: inactive }}
       onPress={onPress}
       disabled={inactive}
-      style={[{ borderRadius: 18, backgroundColor: edge, paddingBottom: DEPTH }, style]}
+      style={({ pressed }) => [
+        styles.button,
+        {
+          backgroundColor: bg,
+          borderColor: outline ? colors.secondary : bg,
+          boxShadow: outline || inactive ? undefined : colors.liftShadow,
+          opacity: pressed && !inactive ? 0.88 : 1,
+          transform: [{ scale: pressed && !inactive ? 0.985 : 1 }],
+        },
+        style,
+      ]}
     >
-      {({ pressed }) => (
-        <View
-          style={[
-            styles.buttonFace,
-            {
-              backgroundColor: face,
-              borderColor: outline ? colors.border : face,
-              transform: [{ translateY: pressed && !inactive ? DEPTH - 1 : 0 }],
-            },
-          ]}
-        >
-          {loading ? (
-            <ActivityIndicator color={fg} />
-          ) : (
-            <>
-              {icon ? <Icon name={icon} size={20} color={fg} /> : null}
-              <Text style={[styles.buttonLabel, { color: fg }]}>{label}</Text>
-            </>
-          )}
-        </View>
+      {loading ? (
+        <ActivityIndicator color={fg} />
+      ) : (
+        <>
+          {icon && !iconAfter ? <Icon name={icon} size={19} color={fg} /> : null}
+          <Text style={[styles.buttonLabel, { color: fg }]}>{label}</Text>
+          {icon && iconAfter ? <Icon name={icon} size={17} color={fg} /> : null}
+        </>
       )}
     </Pressable>
   );
@@ -137,7 +135,7 @@ export function ChunkyButton({
 export function ProgressBar({
   value,
   color = colors.progress,
-  height = 14,
+  height = 8,
   style,
 }: {
   value: number;
@@ -152,20 +150,7 @@ export function ProgressBar({
       accessibilityValue={{ min: 0, max: 100, now: Math.round(pct * 100) }}
       style={[{ height, borderRadius: height, backgroundColor: colors.progressTrack, overflow: "hidden" }, style]}
     >
-      <View style={{ width: `${pct * 100}%`, height: "100%", borderRadius: height, backgroundColor: color }}>
-        {/* glossy highlight */}
-        <View
-          style={{
-            position: "absolute",
-            top: height * 0.2,
-            left: 8,
-            right: 8,
-            height: Math.max(3, height * 0.22),
-            borderRadius: 4,
-            backgroundColor: "rgba(255,255,255,0.45)",
-          }}
-        />
-      </View>
+      <View style={{ width: `${pct * 100}%`, height: "100%", borderRadius: height, backgroundColor: color }} />
     </View>
   );
 }
@@ -174,7 +159,7 @@ export function ProgressBar({
 export function StatPill({ icon, value, color }: { icon: IconName; value: string | number; color: string }) {
   return (
     <View style={styles.pill}>
-      <Icon name={icon} size={18} color={color} />
+      <Icon name={icon} size={17} color={color} />
       <Text style={styles.pillText}>{value}</Text>
     </View>
   );
@@ -193,42 +178,43 @@ export function Muted({ children, style }: { children: ReactNode; style?: StyleP
   return <Text style={[styles.muted, style]}>{children}</Text>;
 }
 
+/** Small uppercase label used above sections and cards. */
+export function Eyebrow({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+  return <Text style={[styles.eyebrow, style]}>{children}</Text>;
+}
+
 const styles = StyleSheet.create({
-  buttonFace: {
-    minHeight: 54,
-    borderRadius: 18,
-    borderWidth: 2,
+  button: {
+    minHeight: 52,
+    borderRadius: 14,
+    borderWidth: 1.5,
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 10,
+    gap: 9,
   },
-  buttonLabel: {
-    fontSize: 16,
-    fontWeight: "800",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-  },
+  buttonLabel: { fontSize: 16, fontWeight: "700", letterSpacing: 0.1 },
   pill: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    gap: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
     borderRadius: 999,
     backgroundColor: colors.surface,
-    borderWidth: 2,
-    borderColor: colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  pillText: { color: colors.text, fontSize: 15, fontWeight: "800", fontVariant: ["tabular-nums"] },
+  pillText: { color: colors.text, fontSize: 15, fontWeight: "700", fontVariant: ["tabular-nums"] },
   card: {
     backgroundColor: colors.surface,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: colors.surfaceRaised,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
     padding: 18,
   },
-  heading: { color: colors.text, fontSize: 24, fontWeight: "900", letterSpacing: -0.3 },
-  muted: { color: colors.textMuted, fontSize: 15, lineHeight: 21 },
+  heading: { color: colors.text, fontSize: 30, fontFamily: fonts.serif, letterSpacing: -0.4 },
+  muted: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
+  eyebrow: { color: colors.textMuted, fontSize: 12, fontWeight: "700", letterSpacing: 1.2, textTransform: "uppercase" },
 });
