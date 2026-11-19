@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/Avatar";
+import { LogoMark } from "@/components/LogoMark";
 import { Button, Card, Eyebrow, Heading, Icon, Muted, ProgressBar, StatPill } from "@/components/ui";
 import { courseProgress } from "@/lib/progress";
 import { SAMPLE_SOURCE } from "@/lib/sample";
@@ -45,9 +46,12 @@ export default function LearnScreen() {
     >
       {/* Top bar */}
       <View style={styles.topBar}>
-        <Text style={styles.wordmark}>
-          cogn<Text style={{ color: colors.xp }}>i</Text>fy
-        </Text>
+        <View style={styles.brand}>
+          <LogoMark size={32} />
+          <Text style={styles.wordmark}>
+            cogn<Text style={{ color: colors.xp }}>i</Text>fy
+          </Text>
+        </View>
         <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
           <StatPill icon="flame" value={streak} color={streak > 0 ? colors.streak : colors.textFaint} />
           <StatPill icon="bolt" value={progress.xp} color={colors.xp} />
@@ -142,9 +146,7 @@ export default function LearnScreen() {
 function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean }) {
   return (
     <Card style={{ alignItems: "center", gap: 14, paddingVertical: 28 }}>
-      <View style={styles.heroBubble}>
-        <Icon name="brain" size={54} color={colors.primary} />
-      </View>
+      <LogoMark size={84} style={{ boxShadow: colors.liftShadow }} />
       <Heading style={{ textAlign: "center" }}>Learn anything</Heading>
       <Muted style={{ textAlign: "center" }}>
         Upload notes, articles or PDFs, or just tell the AI what you want to learn. Cognify turns it into
@@ -179,6 +181,7 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
 const styles = StyleSheet.create({
   topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   greeting: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3, marginTop: -4 },
+  brand: { flexDirection: "row", alignItems: "center", gap: 9 },
   wordmark: { color: colors.primary, fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
   goalNumbers: { color: colors.text, fontWeight: "700", fontVariant: ["tabular-nums"] },
   sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 },
@@ -208,14 +211,4 @@ const styles = StyleSheet.create({
   resumeTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 24, lineHeight: 30, marginTop: 2 },
   resumeMeta: { color: colors.textMuted, fontSize: 14 },
   courseMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
-  heroBubble: {
-    width: 104,
-    height: 104,
-    borderRadius: 52,
-    backgroundColor: colors.background,
-    borderWidth: 1.5,
-    borderColor: colors.secondary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
 });
