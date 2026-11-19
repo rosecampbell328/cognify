@@ -48,6 +48,18 @@ export type Course = {
   createdAt: number;
   /** "ai" when Claude built it, "offline" when the on-device fallback did. */
   generatedBy: "ai" | "offline";
+  /** Set once you've shared this course: the id in its share link. */
+  sharedId?: string;
+  /** Set when you added someone else's shared course to your library. */
+  sharedFrom?: SharedBy;
+};
+
+/** Who made a course you added from a share link (shown as "Created by"). */
+export type SharedBy = {
+  sharedId: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
 };
 
 export type Progress = {

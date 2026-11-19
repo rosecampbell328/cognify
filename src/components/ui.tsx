@@ -50,6 +50,10 @@ const ICONS = {
   chat: { ios: "bubble.left.and.bubble.right.fill", android: "forum" },
   pdf: { ios: "doc.richtext.fill", android: "picture_as_pdf" },
   attach: { ios: "paperclip", android: "attach_file" },
+  share: { ios: "square.and.arrow.up", android: "share" },
+  people: { ios: "person.2.fill", android: "group" },
+  personAdd: { ios: "person.badge.plus", android: "person_add" },
+  search: { ios: "magnifyingglass", android: "search" },
 } satisfies Record<string, { ios: SFSymbol; android: AndroidSymbol }>;
 
 export type IconName = keyof typeof ICONS;
