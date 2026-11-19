@@ -15,6 +15,7 @@ import {
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { LogoMark } from "@/components/LogoMark";
 import { Button, Icon } from "@/components/ui";
 import { sendChat, type ChatMessage } from "@/lib/chat";
 import { makeId, useAppState } from "@/lib/store";
@@ -88,7 +89,8 @@ export default function CreateChatScreen() {
         <Pressable accessibilityLabel="Close" hitSlop={12} onPress={() => router.back()}>
           <Icon name="close" size={22} color={colors.textMuted} />
         </Pressable>
-        <View style={{ flex: 1, alignItems: "center" }}>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <LogoMark size={24} />
           <Text style={styles.headerTitle}>Build with AI</Text>
         </View>
         <View style={{ width: 22 }} />
