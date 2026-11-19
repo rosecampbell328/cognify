@@ -13,12 +13,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChunkyButton, Heading, Icon, Muted } from "@/components/ui";
+import { Button, Heading, Icon, Muted } from "@/components/ui";
 import { pickFiles, type PickedFile } from "@/lib/pickFiles";
 import { addSource } from "@/lib/store";
 import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
 import { colors } from "@/theme/colors";
+import { fonts } from "@/theme/type";
 
 const countWords = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);
 const stripExt = (name: string) => name.replace(/\.[^.]+$/, "");
@@ -188,7 +189,7 @@ export default function AddSourceScreen() {
           />
         </Field>
 
-        <ChunkyButton
+        <Button
           label={busy ? "Building your course…" : "Create my course"}
           icon="sparkles"
           disabled={!ready || reading}
@@ -222,10 +223,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
     backgroundColor: colors.surfaceWarmLight,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.surfaceWarm,
-    borderBottomWidth: 5,
-    borderBottomColor: colors.surfaceWarmEdge,
     borderRadius: 20,
     padding: 16,
   },
@@ -237,16 +236,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  chatTitle: { color: colors.text, fontSize: 17, fontWeight: "800" },
+  chatTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
   chatBody: { color: colors.textMuted, fontSize: 14, lineHeight: 19 },
   dividerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   dividerLine: { flex: 1, height: 2, backgroundColor: colors.border },
   dividerText: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
-  label: { color: colors.text, fontWeight: "800", fontSize: 15 },
+  label: { color: colors.text, fontWeight: "700", fontSize: 15 },
   hint: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
   input: {
     backgroundColor: colors.surface,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 16,
     paddingHorizontal: 16,
@@ -256,7 +255,7 @@ const styles = StyleSheet.create({
   },
   materials: {
     backgroundColor: colors.surface,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 18,
     overflow: "hidden",
@@ -269,7 +268,7 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 16,
   },
-  fileList: { borderTopWidth: 2, borderTopColor: colors.border, paddingHorizontal: 12, paddingVertical: 6 },
+  fileList: { borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: 12, paddingVertical: 6 },
   fileRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, paddingHorizontal: 4 },
   fileName: { color: colors.text, fontWeight: "700", fontSize: 15 },
   fileMeta: { color: colors.textMuted, fontSize: 12, marginTop: 1 },
@@ -277,14 +276,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    borderTopWidth: 2,
+    borderTopWidth: 1,
     borderTopColor: colors.border,
     borderStyle: "dashed",
     backgroundColor: colors.background,
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  addFilesTitle: { color: colors.primary, fontWeight: "800", fontSize: 15 },
+  addFilesTitle: { color: colors.primary, fontWeight: "700", fontSize: 15 },
   addFilesHint: { color: colors.textFaint, fontSize: 12, marginTop: 1 },
   error: { color: colors.wrong, fontWeight: "700" },
 });

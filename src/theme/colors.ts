@@ -69,6 +69,9 @@ export const colors = {
   wrongShadow: derived.terracottaEdge,
   wrongBg: derived.terracottaLight,
 
+  /** Soft lift under solid buttons and raised cards. */
+  liftShadow: "0px 3px 10px rgba(48, 57, 65, 0.12)",
+
   locked: derived.ivoryShade,
   lockedEdge: "#D6CEC0",
   lockedText: "#9A9286",

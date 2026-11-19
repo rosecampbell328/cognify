@@ -23,13 +23,13 @@ export function Avatar({ name, uri, size = 44 }: { name: string; uri: string | n
 }
 
 const styles = StyleSheet.create({
-  image: { backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.secondary },
+  image: { backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.secondary },
   fallback: {
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.secondary,
   },
-  initials: { color: colors.textOnPrimary, fontWeight: "900", letterSpacing: 0.5 },
+  initials: { color: colors.textOnPrimary, fontWeight: "700", letterSpacing: 0.5 },
 });

@@ -14,6 +14,7 @@ import {
   useAppState,
 } from "@/lib/store";
 import { colors } from "@/theme/colors";
+import { fonts } from "@/theme/type";
 
 const GOALS = [
   { xp: 10, label: "Casual" },
@@ -77,7 +78,7 @@ export default function ProfileScreen() {
       </Card>
 
       <Pressable onPress={confirmReset} style={styles.reset}>
-        <Text style={{ color: colors.wrong, fontWeight: "800" }}>Reset all data</Text>
+        <Text style={{ color: colors.wrong, fontWeight: "700" }}>Reset all data</Text>
       </Pressable>
     </ScrollView>
   );
@@ -197,18 +198,18 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     backgroundColor: colors.primary,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   nameRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 4 },
-  name: { color: colors.text, fontSize: 24, fontWeight: "900" },
+  name: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3 },
   nameEditRow: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "stretch" },
   nameInput: {
     flex: 1,
     backgroundColor: colors.background,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.primary,
     borderRadius: 14,
     paddingHorizontal: 14,
@@ -218,24 +219,24 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   saveButton: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12 },
-  saveText: { color: colors.textOnPrimary, fontWeight: "800" },
+  saveText: { color: colors.textOnPrimary, fontWeight: "700" },
   removePhoto: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
   photoError: { color: colors.wrong, fontWeight: "700", textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
   stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
-  statValue: { color: colors.text, fontSize: 26, fontWeight: "900", fontVariant: ["tabular-nums"] },
+  statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 30, fontVariant: ["tabular-nums"] },
   statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "700" },
-  cardTitle: { color: colors.text, fontSize: 17, fontWeight: "800" },
+  cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
   goalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 16,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.surfaceRaised,
   },
-  goalLabel: { color: colors.text, fontWeight: "800", fontSize: 15 },
+  goalLabel: { color: colors.text, fontWeight: "700", fontSize: 15 },
   goalXp: { color: colors.textMuted, fontWeight: "600" },
   reset: { alignSelf: "center", padding: 12 },
 });
