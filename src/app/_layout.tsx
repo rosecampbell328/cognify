@@ -6,8 +6,12 @@ import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { initAccount } from "@/lib/social/account";
 import { colors } from "@/theme/colors";
 import { fontAssets } from "@/theme/type";
+
+// Connect to the Cognify account service, if configured (see README).
+initAccount();
 
 // Keep the splash screen up until the heading font has loaded.
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -36,6 +40,10 @@ export default function RootLayout() {
           <Stack.Screen name="add-source" options={{ presentation: "modal" }} />
           <Stack.Screen name="create-chat" options={{ presentation: "modal" }} />
           <Stack.Screen name="course/[id]" />
+          <Stack.Screen name="sign-in" options={{ presentation: "modal" }} />
+          <Stack.Screen name="c/[id]" />
+          <Stack.Screen name="u/[username]" />
+          <Stack.Screen name="friends" />
           <Stack.Screen
             name="lesson/[courseId]/[lessonId]"
             options={{ presentation: "fullScreenModal", gestureEnabled: false, animation: "slide_from_bottom" }}

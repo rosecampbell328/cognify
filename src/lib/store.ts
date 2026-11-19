@@ -44,7 +44,7 @@ function setState(next: AppState) {
   listeners.forEach((l) => l());
 }
 
-function subscribe(listener: () => void) {
+export function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
 }
@@ -101,6 +101,10 @@ export function removeSource(id: string) {
 
 export function addCourse(course: Course) {
   setState({ ...state, courses: [course, ...state.courses] });
+}
+
+export function updateCourse(id: string, patch: Partial<Course>) {
+  setState({ ...state, courses: state.courses.map((c) => (c.id === id ? { ...c, ...patch } : c)) });
 }
 
 export function removeCourse(id: string) {

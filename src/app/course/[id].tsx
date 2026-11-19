@@ -1,9 +1,14 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CreatedBy } from "@/components/CreatedBy";
 import { Button, Eyebrow, Icon, Muted, ProgressBar } from "@/components/ui";
 import { courseProgress, lessonKey } from "@/lib/progress";
+import { getAccount } from "@/lib/social/account";
+import { socialEnabled } from "@/lib/social/client";
+import { shareCourse } from "@/lib/social/courses";
 import { removeCourse, useAppState } from "@/lib/store";
 import type { Lesson } from "@/lib/types";
 import { colors } from "@/theme/colors";
@@ -18,6 +23,7 @@ export default function CourseScreen() {
   const insets = useSafeAreaInsets();
   const course = useAppState((s) => s.courses.find((c) => c.id === id));
   const completed = useAppState((s) => s.progress.completed);
+  const [sharing, setSharing] = useState(false);
 
   if (!course) {
     return (
@@ -48,6 +54,26 @@ export default function CourseScreen() {
     ]);
   }
 
+  async function share() {
+    if (!socialEnabled) {
+      notify("Sharing isn’t set up yet", "Add your Supabase keys to .env.local (see the README) to share courses.");
+      return;
+    }
+    if (!getAccount().profile) {
+      router.push("/sign-in");
+      return;
+    }
+    setSharing(true);
+    try {
+      const url = await shareCourse(course!);
+      if (Platform.OS === "web" && !navigator.share) notify("Link copied", url);
+    } catch (e) {
+      notify("Couldn’t share this course", e instanceof Error ? e.message : String(e));
+    } finally {
+      setSharing(false);
+    }
+  }
+
   const open = (lesson: Lesson) =>
     router.push({ pathname: "/lesson/[courseId]/[lessonId]", params: { courseId: course.id, lessonId: lesson.id } });
 
@@ -57,9 +83,26 @@ export default function CourseScreen() {
         <Pressable accessibilityLabel="Back" hitSlop={12} onPress={() => router.back()}>
           <Icon name="back" color={colors.text} />
         </Pressable>
-        <Pressable accessibilityLabel="Delete course" hitSlop={12} onPress={confirmDelete}>
-          <Icon name="trash" size={18} color={colors.textFaint} />
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable
+            accessibilityLabel="Share course"
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={share}
+            disabled={sharing}
+            style={styles.shareButton}
+          >
+            {sharing ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Icon name="share" size={17} color={colors.primary} />
+            )}
+            <Text style={styles.shareText}>Share</Text>
+          </Pressable>
+          <Pressable accessibilityLabel="Delete course" hitSlop={12} onPress={confirmDelete}>
+            <Icon name="trash" size={18} color={colors.textFaint} />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 48, paddingHorizontal: 20 }}>
@@ -71,6 +114,13 @@ export default function CourseScreen() {
           </Eyebrow>
           <Text style={styles.title}>{course.title}</Text>
           <Text style={styles.description}>{course.description}</Text>
+          {course.sharedFrom ? (
+            <CreatedBy
+              username={course.sharedFrom.username}
+              displayName={course.sharedFrom.displayName}
+              avatarUrl={course.sharedFrom.avatarUrl}
+            />
+          ) : null}
           <View style={styles.progressRow}>
             <ProgressBar value={cp.fraction} style={{ flex: 1 }} />
             <Text style={styles.progressText}>
@@ -210,6 +260,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 8,
   },
+  headerActions: { flexDirection: "row", alignItems: "center", gap: 18 },
+  shareButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  shareText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
   intro: { paddingTop: 8, paddingBottom: 18, gap: 8 },
   emoji: { fontSize: 40 },
   title: { color: colors.text, fontFamily: fonts.display, fontSize: 30, lineHeight: 36, letterSpacing: -0.4 },
@@ -259,3 +321,8 @@ const styles = StyleSheet.create({
   finish: { flex: 1, paddingTop: 18, paddingBottom: 8 },
   finishText: { color: colors.textFaint, fontSize: 14 },
 });
+
+function notify(title: string, message: string) {
+  if (Platform.OS === "web") globalThis.alert?.(`${title}\n\n${message}`);
+  else Alert.alert(title, message);
+}

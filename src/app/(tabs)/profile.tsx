@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/Avatar";
-import { Card, Heading, Icon, IconName, Muted } from "@/components/ui";
+import { Button, Card, Heading, Icon, IconName, Muted } from "@/components/ui";
 import { deleteAvatarFile, pickAvatar } from "@/lib/pickAvatar";
+import { signOut, useAccount } from "@/lib/social/account";
+import { socialEnabled } from "@/lib/social/client";
+import { loadFriendsOverview } from "@/lib/social/friends";
 import {
   liveStreak,
   resetEverything,
@@ -50,6 +54,8 @@ export default function ProfileScreen() {
 
       <ProfileHeader />
 
+      <AccountCard />
+
       <View style={styles.grid}>
         <Stat icon="flame" color={colors.streak} value={liveStreak(progress)} label="Day streak" />
         <Stat icon="bolt" color={colors.xp} value={progress.xp} label="Total XP" />
@@ -81,6 +87,60 @@ export default function ProfileScreen() {
         <Text style={{ color: colors.wrong, fontWeight: "700" }}>Reset all data</Text>
       </Pressable>
     </ScrollView>
+  );
+}
+
+function AccountCard() {
+  const session = useAccount((a) => a.session);
+  const profile = useAccount((a) => a.profile);
+  const [requests, setRequests] = useState(0);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!profile) return;
+      loadFriendsOverview()
+        .then((o) => setRequests(o.incoming.length))
+        .catch(() => {});
+    }, [profile]),
+  );
+
+  if (!socialEnabled) return null;
+
+  if (!profile) {
+    return (
+      <Card style={{ gap: 10 }}>
+        <Text style={styles.cardTitle}>{session ? "Finish your account" : "Share courses and add friends"}</Text>
+        <Muted>
+          {session
+            ? "Pick a username so friends can find you."
+            : "Sign in with your email to share courses with a link and add friends."}
+        </Muted>
+        <Button label={session ? "Pick a username" : "Sign in with email"} onPress={() => router.push("/sign-in")} />
+      </Card>
+    );
+  }
+
+  return (
+    <Card style={{ gap: 12 }}>
+      <View style={styles.accountRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.accountLabel}>Signed in as</Text>
+          <Text style={styles.accountHandle}>@{profile.username}</Text>
+        </View>
+        <Pressable onPress={() => router.push({ pathname: "/u/[username]", params: { username: profile.username } })} hitSlop={8}>
+          <Text style={styles.link}>View public profile</Text>
+        </Pressable>
+      </View>
+      <Button
+        label={requests > 0 ? `Friends · ${requests} new request${requests === 1 ? "" : "s"}` : "Friends"}
+        icon="people"
+        variant={requests > 0 ? "solid" : "outline"}
+        onPress={() => router.push("/friends")}
+      />
+      <Pressable onPress={() => void signOut()} hitSlop={8} style={{ alignSelf: "center" }}>
+        <Text style={styles.signOut}>Sign out</Text>
+      </Pressable>
+    </Card>
   );
 }
 
@@ -190,6 +250,11 @@ function Stat({ icon, color, value, label }: { icon: IconName; color: string; va
 
 const styles = StyleSheet.create({
   profileCard: { alignItems: "center", gap: 12, paddingVertical: 24 },
+  accountRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+  accountLabel: { color: colors.textMuted, fontSize: 13 },
+  accountHandle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
+  link: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+  signOut: { color: colors.textFaint, fontWeight: "600", fontSize: 14 },
   cameraBadge: {
     position: "absolute",
     right: -2,
