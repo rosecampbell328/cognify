@@ -1,90 +1,144 @@
 /**
- * Cognify palette. Every colour in the app comes from here — screens use the
- * semantic `colors` tokens below, never raw hex values.
+ * Cognify colours: the "Teal" scheme in a light and a dark version.
+ * Screens never use raw hex values — they read these tokens through
+ * `useColors()` / `makeStyles()` (see ./theme.tsx), so switching modes
+ * restyles the whole app.
+ *
+ * Roles: teal leads (buttons, navigation, progress), amber is the reward
+ * colour (XP, streaks, achievements), green/rose are only for right/wrong.
  */
-export const palette = {
-  deepDustyBlue: "#456783", // primary buttons and navigation
-  softBlue: "#A9C2D4", // progress bars and secondary accents
-  paleBlue: "#E8F0F5", // course cards and highlights
-  warmTan: "#D9C3A3", // secondary backgrounds
-  ivory: "#F8F5EF", // main app background
-  darkCharcoal: "#303941", // text and headings
-  mutedGold: "#D6AA63", // XP, streaks and achievements
-} as const;
+export type ThemeColors = {
+  background: string;
+  surface: string;
+  surfaceRaised: string;
+  border: string;
+  /** Tinted cards that call attention (e.g. "Describe it to AI", course banner). */
+  accentSurface: string;
+  accentSurfaceSoft: string;
+  accentBorder: string;
 
-/**
- * Supporting shades derived from the palette: darker "edge" colours for the
- * chunky 3D buttons, softer text tints, and the correct/incorrect feedback
- * colours (the core palette has no green or red, so these are muted to match).
- */
-const derived = {
-  dustyBlueEdge: "#2F4A61",
-  softBlueEdge: "#7F9DB3",
-  goldEdge: "#AD8540",
-  tanEdge: "#B89F7B",
-  tanLight: "#F0E6D6",
-  charcoalMuted: "#55616B",
-  charcoalFaint: "#6F7A84",
-  paleBlueBorder: "#CFDDE7",
-  ivoryShade: "#E9E3D8",
-  sage: "#5E8C6C",
-  sageEdge: "#456B51",
-  sageLight: "#E1EDE4",
-  terracotta: "#B35F4C",
-  terracottaEdge: "#8A4536",
-  terracottaLight: "#F6E2DC",
-} as const;
+  text: string;
+  textMuted: string;
+  textFaint: string;
+  textOnPrimary: string;
 
-/** Semantic tokens used by components. */
-export const colors = {
-  background: palette.ivory,
-  surface: palette.paleBlue,
-  surfaceRaised: derived.paleBlueBorder,
-  border: derived.paleBlueBorder,
-  surfaceWarm: palette.warmTan,
-  surfaceWarmLight: derived.tanLight,
-  surfaceWarmEdge: derived.tanEdge,
+  primary: string;
+  primaryShadow: string;
+  secondary: string;
+  secondaryShadow: string;
 
-  text: palette.darkCharcoal,
-  textMuted: derived.charcoalMuted,
-  textFaint: derived.charcoalFaint,
-  textOnPrimary: palette.ivory,
+  progress: string;
+  progressTrack: string;
 
-  primary: palette.deepDustyBlue,
-  primaryShadow: derived.dustyBlueEdge,
-  secondary: palette.softBlue,
-  secondaryShadow: derived.softBlueEdge,
+  xp: string;
+  xpShadow: string;
+  streak: string;
 
-  progress: palette.softBlue,
-  progressTrack: derived.ivoryShade,
-
-  xp: palette.mutedGold,
-  xpShadow: derived.goldEdge,
-  streak: palette.mutedGold,
-
-  correct: derived.sage,
-  correctShadow: derived.sageEdge,
-  correctBg: derived.sageLight,
-  wrong: derived.terracotta,
-  wrongShadow: derived.terracottaEdge,
-  wrongBg: derived.terracottaLight,
+  correct: string;
+  correctShadow: string;
+  correctBg: string;
+  wrong: string;
+  wrongShadow: string;
+  wrongBg: string;
 
   /** Soft lift under solid buttons and raised cards. */
-  liftShadow: "0px 3px 10px rgba(48, 57, 65, 0.12)",
+  liftShadow: string;
 
-  locked: derived.ivoryShade,
-  lockedEdge: "#D6CEC0",
-  lockedText: "#9A9286",
+  locked: string;
+  lockedEdge: string;
+  lockedText: string;
+};
+
+export const lightColors: ThemeColors = {
+  background: "#F5F8F9",
+  surface: "#FFFFFF",
+  surfaceRaised: "#E8F0F2",
+  border: "#DCE6E9",
+  accentSurface: "#DDF3F0",
+  accentSurfaceSoft: "#EEF9F7",
+  accentBorder: "#99D9D0",
+
+  text: "#0B1F2A",
+  textMuted: "#45606B",
+  textFaint: "#62777F",
+  textOnPrimary: "#FFFFFF",
+
+  primary: "#0F766E",
+  primaryShadow: "#115E59",
+  secondary: "#CCEFEA",
+  secondaryShadow: "#8DD8CE",
+
+  progress: "#14B8A6",
+  progressTrack: "#E3ECEE",
+
+  xp: "#F59E0B",
+  xpShadow: "#B45309",
+  streak: "#F97316",
+
+  correct: "#059669",
+  correctShadow: "#047857",
+  correctBg: "#E3F6EE",
+  wrong: "#E11D48",
+  wrongShadow: "#9F1239",
+  wrongBg: "#FDE8EE",
+
+  liftShadow: "0px 4px 14px rgba(15, 118, 110, 0.18)",
+
+  locked: "#EBF0F2",
+  lockedEdge: "#D3DDE0",
+  lockedText: "#8FA3AA",
+};
+
+export const darkColors: ThemeColors = {
+  background: "#0A1517",
+  surface: "#122124",
+  surfaceRaised: "#1A2E32",
+  border: "#21383C",
+  accentSurface: "#0F3532",
+  accentSurfaceSoft: "#0E2A28",
+  accentBorder: "#1F6B63",
+
+  text: "#E4F1F2",
+  textMuted: "#9DB8BC",
+  textFaint: "#7A9599",
+  // Bright aqua buttons need dark text to stay readable.
+  textOnPrimary: "#04201D",
+
+  primary: "#2DD4BF",
+  primaryShadow: "#14B8A6",
+  secondary: "#173B3A",
+  secondaryShadow: "#24574F",
+
+  progress: "#2DD4BF",
+  progressTrack: "#1A2E32",
+
+  xp: "#FBBF24",
+  xpShadow: "#D97706",
+  streak: "#FB923C",
+
+  correct: "#34D399",
+  correctShadow: "#059669",
+  correctBg: "#0F2A24",
+  wrong: "#FB7185",
+  wrongShadow: "#E11D48",
+  wrongBg: "#341820",
+
+  liftShadow: "0px 6px 18px rgba(45, 212, 191, 0.18)",
+
+  locked: "#16262A",
+  lockedEdge: "#25393D",
+  lockedText: "#5E777B",
+};
+
+/**
+ * Fixed brand colours for the logo mark and app icon — the same in light and
+ * dark mode, matching assets/expo.icon/Assets/cognify-notes.svg.
+ */
+export const brand = {
+  tile: "#0F766E",
+  backCard: "#2DD4BF",
+  middleCard: "#FCD34D",
+  note: "#F8FAFC",
+  headingLine: "#F59E0B",
+  line: "#7FD3C8",
 } as const;
-
-/** Colour cycle for course cards and path nodes. */
-export const courseAccents = [
-  { fill: palette.deepDustyBlue, shadow: derived.dustyBlueEdge },
-  { fill: palette.softBlue, shadow: derived.softBlueEdge },
-  { fill: palette.mutedGold, shadow: derived.goldEdge },
-  { fill: palette.warmTan, shadow: derived.tanEdge },
-] as const;
-
-export function accentFor(index: number) {
-  return courseAccents[Math.abs(index) % courseAccents.length];
-}

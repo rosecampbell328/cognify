@@ -1,9 +1,10 @@
 import { StyleSheet, View, type ViewStyle } from "react-native";
 
-import { colors } from "@/theme/colors";
+import { brand } from "@/theme/colors";
 
 /**
- * The Cognify mark — the same "stack of notes" as the app icon
+ * The Cognify mark — the same "stack of notes" as the app icon, in the fixed
+ * brand colours
  * (assets/expo.icon/Assets/cognify-notes.svg), drawn with Views so it stays
  * crisp at any size without an SVG library.
  *
@@ -18,12 +19,12 @@ const MARK_SHIFT = 12;
 type Shape = { x: number; y: number; w: number; h: number; r: number; color: string; rotate?: number };
 
 const SHAPES: Shape[] = [
-  { x: 312, y: 372, w: 400, h: 300, r: 52, color: colors.secondary, rotate: -12 }, // back card
-  { x: 312, y: 356, w: 400, h: 300, r: 52, color: colors.surfaceWarm, rotate: 7 }, // middle card
-  { x: 312, y: 330, w: 400, h: 300, r: 52, color: colors.background }, // front note
-  { x: 372, y: 398, w: 150, h: 34, r: 17, color: colors.xp }, // gold heading line
-  { x: 372, y: 462, w: 280, h: 30, r: 15, color: colors.secondary },
-  { x: 372, y: 520, w: 220, h: 30, r: 15, color: colors.secondary },
+  { x: 312, y: 372, w: 400, h: 300, r: 52, color: brand.backCard, rotate: -12 },
+  { x: 312, y: 356, w: 400, h: 300, r: 52, color: brand.middleCard, rotate: 7 },
+  { x: 312, y: 330, w: 400, h: 300, r: 52, color: brand.note }, // front note
+  { x: 372, y: 398, w: 150, h: 34, r: 17, color: brand.headingLine },
+  { x: 372, y: 462, w: 280, h: 30, r: 15, color: brand.line },
+  { x: 372, y: 520, w: 220, h: 30, r: 15, color: brand.line },
 ];
 
 export function LogoMark({ size = 32, style }: { size?: number; style?: ViewStyle }) {
@@ -64,6 +65,7 @@ export function LogoMark({ size = 32, style }: { size?: number; style?: ViewStyl
   );
 }
 
+// The logo looks the same in light and dark mode.
 const styles = StyleSheet.create({
-  tile: { backgroundColor: colors.primary, overflow: "hidden" },
+  tile: { backgroundColor: brand.tile, overflow: "hidden" },
 });

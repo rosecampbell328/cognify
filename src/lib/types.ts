@@ -80,7 +80,13 @@ export type Profile = {
   avatarUri: string | null;
 };
 
+/** "system" follows the phone's light/dark setting. */
+export type Appearance = "system" | "light" | "dark";
+
+export type Settings = { appearance: Appearance };
+
 export type AppState = {
+  settings: Settings;
   profile: Profile;
   sources: Source[];
   courses: Course[];

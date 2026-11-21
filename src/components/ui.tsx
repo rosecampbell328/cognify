@@ -12,7 +12,7 @@ import {
   ViewStyle,
 } from "react-native";
 
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 // ── Icons ───────────────────────────────────────────────
@@ -54,17 +54,21 @@ const ICONS = {
   people: { ios: "person.2.fill", android: "group" },
   personAdd: { ios: "person.badge.plus", android: "person_add" },
   search: { ios: "magnifyingglass", android: "search" },
+  sun: { ios: "sun.max.fill", android: "light_mode" },
+  moon: { ios: "moon.fill", android: "dark_mode" },
+  phone: { ios: "iphone", android: "smartphone" },
 } satisfies Record<string, { ios: SFSymbol; android: AndroidSymbol }>;
 
 export type IconName = keyof typeof ICONS;
 
-export function Icon({ name, size = 22, color = colors.text }: { name: IconName; size?: number; color?: ColorValue }) {
+export function Icon({ name, size = 22, color }: { name: IconName; size?: number; color?: ColorValue }) {
+  const colors = useColors();
   const n = ICONS[name];
   return (
     <SymbolView
       name={{ ios: n.ios, android: n.android, web: n.android }}
       size={size}
-      tintColor={color}
+      tintColor={color ?? colors.text}
       weight="semibold"
       style={{ width: size, height: size }}
     />
@@ -90,8 +94,8 @@ type ButtonProps = {
 export function Button({
   label,
   onPress,
-  color = colors.primary,
-  textColor = colors.textOnPrimary,
+  color: colorProp,
+  textColor: textColorProp,
   icon,
   iconAfter,
   disabled,
@@ -99,6 +103,10 @@ export function Button({
   variant = "solid",
   style,
 }: ButtonProps) {
+  const colors = useColors();
+  const styles = useStyles();
+  const color = colorProp ?? colors.primary;
+  const textColor = textColorProp ?? colors.textOnPrimary;
   const outline = variant === "outline";
   const inactive = disabled || loading;
   const bg = inactive ? colors.locked : outline ? "transparent" : color;
@@ -138,7 +146,7 @@ export function Button({
 // ── Progress bar ────────────────────────────────────────
 export function ProgressBar({
   value,
-  color = colors.progress,
+  color: colorProp,
   height = 8,
   style,
 }: {
@@ -147,6 +155,8 @@ export function ProgressBar({
   height?: number;
   style?: StyleProp<ViewStyle>;
 }) {
+  const colors = useColors();
+  const color = colorProp ?? colors.progress;
   const pct = Math.max(0, Math.min(1, value));
   return (
     <View
@@ -161,6 +171,7 @@ export function ProgressBar({
 
 // ── Stat pill (streak / XP) ─────────────────────────────
 export function StatPill({ icon, value, color }: { icon: IconName; value: string | number; color: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.pill}>
       <Icon name={icon} size={17} color={color} />
@@ -171,54 +182,60 @@ export function StatPill({ icon, value, color }: { icon: IconName; value: string
 
 // ── Card ────────────────────────────────────────────────
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
+  const styles = useStyles();
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
 export function Heading({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+  const styles = useStyles();
   return <Text style={[styles.heading, style]}>{children}</Text>;
 }
 
 export function Muted({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+  const styles = useStyles();
   return <Text style={[styles.muted, style]}>{children}</Text>;
 }
 
 /** Small uppercase label used above sections and cards. */
 export function Eyebrow({ children, style }: { children: ReactNode; style?: StyleProp<TextStyle> }) {
+  const styles = useStyles();
   return <Text style={[styles.eyebrow, style]}>{children}</Text>;
 }
 
-const styles = StyleSheet.create({
-  button: {
-    minHeight: 52,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 9,
-  },
-  buttonLabel: { fontSize: 16, fontWeight: "700", letterSpacing: 0.1 },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  pillText: { color: colors.text, fontSize: 15, fontWeight: "700", fontVariant: ["tabular-nums"] },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 18,
-  },
-  heading: { color: colors.text, fontSize: 30, fontFamily: fonts.display, letterSpacing: -0.4 },
-  muted: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
-  eyebrow: { color: colors.textMuted, fontSize: 12, fontWeight: "700", letterSpacing: 1.2, textTransform: "uppercase" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    button: {
+      minHeight: 52,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      paddingHorizontal: 20,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 9,
+    },
+    buttonLabel: { fontSize: 16, fontWeight: "700", letterSpacing: 0.1 },
+    pill: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+      paddingHorizontal: 11,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    pillText: { color: colors.text, fontSize: 15, fontWeight: "700", fontVariant: ["tabular-nums"] },
+    card: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 18,
+    },
+    heading: { color: colors.text, fontSize: 30, fontFamily: fonts.display, letterSpacing: -0.4 },
+    muted: { color: colors.textMuted, fontSize: 15, lineHeight: 22 },
+    eyebrow: { color: colors.textMuted, fontSize: 12, fontWeight: "700", letterSpacing: 1.2, textTransform: "uppercase" },
+  }),
+);

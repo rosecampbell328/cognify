@@ -14,7 +14,7 @@ import {
   type SharedCourse,
 } from "@/lib/social/courses";
 import { useAppState } from "@/lib/store";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 /** Store links for the "Get the app" section on the web page (set once the app is listed). */
@@ -33,6 +33,8 @@ function storeForThisDevice(): string | undefined {
 }
 
 export default function SharedCourseScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const [load, setLoad] = useState<Load>({ state: "loading" });
@@ -145,9 +147,11 @@ export default function SharedCourseScreen() {
 
 /** Web only: for people opening the link without the app. */
 function GetTheApp({ sharedId }: { sharedId?: string }) {
+  const colors = useColors();
+  const styles = useStyles();
   const listed = APP_STORE_URL || PLAY_STORE_URL;
   return (
-    <Card style={{ gap: 10, backgroundColor: colors.surfaceWarmLight, borderColor: colors.surfaceWarm }}>
+    <Card style={{ gap: 10, backgroundColor: colors.accentSurfaceSoft, borderColor: colors.accentSurface }}>
       <Text style={styles.getTitle}>Learn this on your phone</Text>
       <Muted>
         {listed
@@ -167,26 +171,28 @@ function GetTheApp({ sharedId }: { sharedId?: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  brand: { flexDirection: "row", alignItems: "center", gap: 7 },
-  brandText: { color: colors.primary, fontFamily: fonts.display, fontSize: 18 },
-  center: { paddingVertical: 60, alignItems: "center" },
-  emoji: { fontSize: 40 },
-  title: { color: colors.text, fontFamily: fonts.display, fontSize: 28, lineHeight: 34, letterSpacing: -0.3 },
-  lessonRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
-  lessonDivider: { borderTopWidth: 1, borderTopColor: colors.border },
-  lessonNum: { width: 22, color: colors.textFaint, fontWeight: "700", fontVariant: ["tabular-nums"] },
-  lessonTitle: { flex: 1, color: colors.text, fontFamily: fonts.displayMedium, fontSize: 16 },
-  lessonMeta: { color: colors.textFaint, fontSize: 13 },
-  getTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
-  openApp: { color: colors.primary, fontWeight: "700", textAlign: "center", marginTop: 4 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 20,
+      paddingBottom: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    brand: { flexDirection: "row", alignItems: "center", gap: 7 },
+    brandText: { color: colors.primary, fontFamily: fonts.display, fontSize: 18 },
+    center: { paddingVertical: 60, alignItems: "center" },
+    emoji: { fontSize: 40 },
+    title: { color: colors.text, fontFamily: fonts.display, fontSize: 28, lineHeight: 34, letterSpacing: -0.3 },
+    lessonRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
+    lessonDivider: { borderTopWidth: 1, borderTopColor: colors.border },
+    lessonNum: { width: 22, color: colors.textFaint, fontWeight: "700", fontVariant: ["tabular-nums"] },
+    lessonTitle: { flex: 1, color: colors.text, fontFamily: fonts.displayMedium, fontSize: 16 },
+    lessonMeta: { color: colors.textFaint, fontSize: 13 },
+    getTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
+    openApp: { color: colors.primary, fontWeight: "700", textAlign: "center", marginTop: 4 },
+  }),
+);

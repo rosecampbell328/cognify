@@ -18,13 +18,15 @@ import { pickFiles, type PickedFile } from "@/lib/pickFiles";
 import { addSource } from "@/lib/store";
 import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 const countWords = (s: string) => (s.trim() ? s.trim().split(/\s+/).length : 0);
 const stripExt = (name: string) => name.replace(/\.[^.]+$/, "");
 
 export default function AddSourceScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const [title, setTitle] = useState("");
   const [pasted, setPasted] = useState("");
@@ -206,6 +208,7 @@ export default function AddSourceScreen() {
 }
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  const styles = useStyles();
   return (
     <View style={{ gap: 8 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
@@ -217,73 +220,75 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
-const styles = StyleSheet.create({
-  chatCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    backgroundColor: colors.surfaceWarmLight,
-    borderWidth: 1.5,
-    borderColor: colors.surfaceWarm,
-    borderRadius: 20,
-    padding: 16,
-  },
-  chatIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 14,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  chatTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
-  chatBody: { color: colors.textMuted, fontSize: 14, lineHeight: 19 },
-  dividerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  dividerLine: { flex: 1, height: 2, backgroundColor: colors.border },
-  dividerText: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
-  label: { color: colors.text, fontWeight: "700", fontSize: 15 },
-  hint: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: colors.text,
-    fontSize: 16,
-  },
-  materials: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 18,
-    overflow: "hidden",
-  },
-  pasteInput: {
-    minHeight: 150,
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 14,
-    color: colors.text,
-    fontSize: 16,
-  },
-  fileList: { borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: 12, paddingVertical: 6 },
-  fileRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, paddingHorizontal: 4 },
-  fileName: { color: colors.text, fontWeight: "700", fontSize: 15 },
-  fileMeta: { color: colors.textMuted, fontSize: 12, marginTop: 1 },
-  addFiles: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    borderStyle: "dashed",
-    backgroundColor: colors.background,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-  },
-  addFilesTitle: { color: colors.primary, fontWeight: "700", fontSize: 15 },
-  addFilesHint: { color: colors.textFaint, fontSize: 12, marginTop: 1 },
-  error: { color: colors.wrong, fontWeight: "700" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    chatCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+      backgroundColor: colors.accentSurfaceSoft,
+      borderWidth: 1.5,
+      borderColor: colors.accentSurface,
+      borderRadius: 20,
+      padding: 16,
+    },
+    chatIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: 14,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    chatTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
+    chatBody: { color: colors.textMuted, fontSize: 14, lineHeight: 19 },
+    dividerRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+    dividerLine: { flex: 1, height: 2, backgroundColor: colors.border },
+    dividerText: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
+    label: { color: colors.text, fontWeight: "700", fontSize: 15 },
+    hint: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      color: colors.text,
+      fontSize: 16,
+    },
+    materials: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 18,
+      overflow: "hidden",
+    },
+    pasteInput: {
+      minHeight: 150,
+      paddingHorizontal: 16,
+      paddingTop: 14,
+      paddingBottom: 14,
+      color: colors.text,
+      fontSize: 16,
+    },
+    fileList: { borderTopWidth: 1, borderTopColor: colors.border, paddingHorizontal: 12, paddingVertical: 6 },
+    fileRow: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 8, paddingHorizontal: 4 },
+    fileName: { color: colors.text, fontWeight: "700", fontSize: 15 },
+    fileMeta: { color: colors.textMuted, fontSize: 12, marginTop: 1 },
+    addFiles: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      borderStyle: "dashed",
+      backgroundColor: colors.background,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+    },
+    addFilesTitle: { color: colors.primary, fontWeight: "700", fontSize: 15 },
+    addFilesHint: { color: colors.textFaint, fontSize: 12, marginTop: 1 },
+    error: { color: colors.wrong, fontWeight: "700" },
+  }),
+);

@@ -16,11 +16,13 @@ import {
   type Relation,
 } from "@/lib/social/friends";
 import type { PublicProfile } from "@/lib/social/types";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 /** Someone's public profile: photo, name, and just four stats. */
 export default function PublicProfileScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { username } = useLocalSearchParams<{ username: string }>();
   const insets = useSafeAreaInsets();
   const myProfile = useAccount((a) => a.profile);
@@ -80,6 +82,8 @@ export default function PublicProfileScreen() {
 }
 
 function FriendButton({ profile, signedIn }: { profile: PublicProfile; signedIn: boolean }) {
+  const colors = useColors();
+  const styles = useStyles();
   const [relation, setRelation] = useState<Relation | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -141,6 +145,7 @@ function FriendButton({ profile, signedIn }: { profile: PublicProfile; signedIn:
 }
 
 function Stat({ icon, color, value, label }: { icon: IconName; color: string; value: number; label: string }) {
+  const styles = useStyles();
   return (
     <Card style={styles.stat}>
       <Icon name={icon} size={24} color={color} />
@@ -150,30 +155,32 @@ function Stat({ icon, color, value, label }: { icon: IconName; color: string; va
   );
 }
 
-const styles = StyleSheet.create({
-  header: { paddingHorizontal: 20, paddingBottom: 6 },
-  identity: { alignItems: "center", gap: 6, paddingBottom: 6 },
-  name: { color: colors.text, fontFamily: fonts.display, fontSize: 26, marginTop: 6 },
-  handle: { color: colors.textMuted, fontSize: 16, fontWeight: "600" },
-  action: { alignSelf: "stretch", marginTop: 10 },
-  note: { color: colors.textMuted, fontSize: 14, marginTop: 6 },
-  status: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    alignSelf: "stretch",
-    marginTop: 10,
-    paddingVertical: 13,
-    borderRadius: 14,
-  },
-  statusFriends: { backgroundColor: colors.correctBg },
-  statusPending: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
-  statusText: { fontWeight: "700", fontSize: 16 },
-  subtle: { color: colors.textFaint, fontWeight: "600", fontSize: 13 },
-  error: { color: colors.wrong, fontWeight: "600", textAlign: "center" },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
-  statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 28, fontVariant: ["tabular-nums"] },
-  statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    header: { paddingHorizontal: 20, paddingBottom: 6 },
+    identity: { alignItems: "center", gap: 6, paddingBottom: 6 },
+    name: { color: colors.text, fontFamily: fonts.display, fontSize: 26, marginTop: 6 },
+    handle: { color: colors.textMuted, fontSize: 16, fontWeight: "600" },
+    action: { alignSelf: "stretch", marginTop: 10 },
+    note: { color: colors.textMuted, fontSize: 14, marginTop: 6 },
+    status: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      alignSelf: "stretch",
+      marginTop: 10,
+      paddingVertical: 13,
+      borderRadius: 14,
+    },
+    statusFriends: { backgroundColor: colors.correctBg },
+    statusPending: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    statusText: { fontWeight: "700", fontSize: 16 },
+    subtle: { color: colors.textFaint, fontWeight: "600", fontSize: 13 },
+    error: { color: colors.wrong, fontWeight: "600", textAlign: "center" },
+    grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+    stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
+    statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 28, fontVariant: ["tabular-nums"] },
+    statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
+  }),
+);

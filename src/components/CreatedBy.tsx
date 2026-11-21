@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors } from "@/theme/colors";
+import { makeStyles } from "@/theme/theme";
 
 import { Avatar } from "./Avatar";
 
@@ -15,6 +15,7 @@ export function CreatedBy({
   displayName: string;
   avatarUrl: string | null;
 }) {
+  const styles = useStyles();
   const name = displayName.trim() || `@${username}`;
   return (
     <Pressable
@@ -34,8 +35,10 @@ export function CreatedBy({
   );
 }
 
-const styles = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", paddingVertical: 4 },
-  label: { color: colors.textMuted, fontSize: 14 },
-  username: { color: colors.primary, fontSize: 14, fontWeight: "700" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    row: { flexDirection: "row", alignItems: "center", gap: 7, alignSelf: "flex-start", paddingVertical: 4 },
+    label: { color: colors.textMuted, fontSize: 14 },
+    username: { color: colors.primary, fontSize: 14, fontWeight: "700" },
+  }),
+);

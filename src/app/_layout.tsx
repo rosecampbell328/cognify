@@ -7,7 +7,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { initAccount } from "@/lib/social/account";
-import { colors } from "@/theme/colors";
+import { ThemeProvider, useColors, useScheme } from "@/theme/theme";
 import { fontAssets } from "@/theme/type";
 
 // Connect to the Cognify account service, if configured (see README).
@@ -27,9 +27,21 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
+    <ThemeProvider>
+      <AppShell />
+    </ThemeProvider>
+  );
+}
+
+/** Everything inside the theme, so it restyles when light/dark changes. */
+function AppShell() {
+  const colors = useColors();
+  const scheme = useScheme();
+  return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.background }}>
       <SafeAreaProvider>
-        <StatusBar style="dark" />
+        {/* Dark status-bar text on light screens, light text on dark screens. */}
+        <StatusBar style={scheme === "dark" ? "light" : "dark"} />
         <Stack
           screenOptions={{
             headerShown: false,

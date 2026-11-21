@@ -21,7 +21,7 @@ Upload anything, or just describe what you want to learn, and learn it the Duoli
 | **Share links** (`src/app/c/[id].tsx`, `src/lib/social/courses.ts`) | **Share** on any course makes a link. Opening it shows the course with "Created by @username" and **Add to my library**; on the web it offers the app instead |
 | **Friends** (`src/app/friends.tsx`, `src/app/u/[username].tsx`) | Find people by username, send and accept friend requests; profiles show only streak, courses, lessons done and total XP |
 
-Progress is saved on the device (SQLite key-value store on iOS/Android, `localStorage` on web). Accounts, shared courses and friends live in Supabase (see below); the rest of the app works without it. All colours live in `src/theme/colors.ts`.
+Progress is saved on the device (SQLite key-value store on iOS/Android, `localStorage` on web). Accounts, shared courses and friends live in Supabase (see below); the rest of the app works without it. Cognify has a light and a dark mode in a teal colour scheme. It follows the phone's setting, and people can pick System, Light or Dark in Profile. Colours live in `src/theme/colors.ts`; screens read them with `useColors()` and `makeStyles()` from `src/theme/theme.tsx`, so never hard-code a colour in a screen.
 
 ## Run it
 

@@ -20,7 +20,7 @@ import { Button, Icon } from "@/components/ui";
 import { sendChat, type ChatMessage } from "@/lib/chat";
 import { makeId, useAppState } from "@/lib/store";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 const SUGGESTIONS = [
@@ -33,6 +33,8 @@ const SUGGESTIONS = [
 type Plan = { title: string; brief: string };
 
 export default function CreateChatScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const firstName = useAppState((s) => s.profile.name.split(" ")[0]);
   const greeting: ChatMessage = {
@@ -195,83 +197,85 @@ export default function CreateChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 18,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
-  bubble: { maxWidth: "85%", borderRadius: 20, paddingHorizontal: 16, paddingVertical: 11 },
-  aiBubble: {
-    alignSelf: "flex-start",
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderBottomLeftRadius: 6,
-  },
-  userBubble: { alignSelf: "flex-end", backgroundColor: colors.primary, borderBottomRightRadius: 6 },
-  aiText: { color: colors.text, fontSize: 16, lineHeight: 22 },
-  userText: { color: colors.textOnPrimary, fontSize: 16, lineHeight: 22 },
-  chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
-  chip: {
-    borderWidth: 1.5,
-    borderColor: colors.secondary,
-    backgroundColor: colors.background,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-  },
-  chipText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
-  errorBox: { backgroundColor: colors.wrongBg, borderRadius: 16, padding: 14, gap: 6 },
-  errorText: { color: colors.text, fontSize: 14, lineHeight: 20 },
-  retry: { color: colors.wrong, fontWeight: "700" },
-  planCard: {
-    backgroundColor: colors.surfaceWarmLight,
-    borderWidth: 1.5,
-    borderColor: colors.surfaceWarm,
-    borderRadius: 22,
-    padding: 16,
-    gap: 10,
-    marginTop: 4,
-  },
-  planEyebrow: { color: colors.primaryShadow, fontWeight: "700", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase" },
-  planTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
-  planBrief: { color: colors.textMuted, fontSize: 14, lineHeight: 20 },
-  planHint: { color: colors.textFaint, fontSize: 13, textAlign: "center" },
-  composer: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 10,
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
-  },
-  input: {
-    flex: 1,
-    maxHeight: 120,
-    minHeight: 46,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 23,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 12,
-    color: colors.text,
-    fontSize: 16,
-  },
-  sendButton: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: 18,
+      paddingBottom: 12,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 19 },
+    bubble: { maxWidth: "85%", borderRadius: 20, paddingHorizontal: 16, paddingVertical: 11 },
+    aiBubble: {
+      alignSelf: "flex-start",
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderBottomLeftRadius: 6,
+    },
+    userBubble: { alignSelf: "flex-end", backgroundColor: colors.primary, borderBottomRightRadius: 6 },
+    aiText: { color: colors.text, fontSize: 16, lineHeight: 22 },
+    userText: { color: colors.textOnPrimary, fontSize: 16, lineHeight: 22 },
+    chips: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 4 },
+    chip: {
+      borderWidth: 1.5,
+      borderColor: colors.secondary,
+      backgroundColor: colors.background,
+      borderRadius: 999,
+      paddingHorizontal: 14,
+      paddingVertical: 9,
+    },
+    chipText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+    errorBox: { backgroundColor: colors.wrongBg, borderRadius: 16, padding: 14, gap: 6 },
+    errorText: { color: colors.text, fontSize: 14, lineHeight: 20 },
+    retry: { color: colors.wrong, fontWeight: "700" },
+    planCard: {
+      backgroundColor: colors.accentSurfaceSoft,
+      borderWidth: 1.5,
+      borderColor: colors.accentSurface,
+      borderRadius: 22,
+      padding: 16,
+      gap: 10,
+      marginTop: 4,
+    },
+    planEyebrow: { color: colors.primaryShadow, fontWeight: "700", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase" },
+    planTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
+    planBrief: { color: colors.textMuted, fontSize: 14, lineHeight: 20 },
+    planHint: { color: colors.textFaint, fontSize: 13, textAlign: "center" },
+    composer: {
+      flexDirection: "row",
+      alignItems: "flex-end",
+      gap: 10,
+      paddingHorizontal: 14,
+      paddingTop: 10,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.background,
+    },
+    input: {
+      flex: 1,
+      maxHeight: 120,
+      minHeight: 46,
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 23,
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      paddingBottom: 12,
+      color: colors.text,
+      fontSize: 16,
+    },
+    sendButton: {
+      width: 46,
+      height: 46,
+      borderRadius: 23,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+  }),
+);
