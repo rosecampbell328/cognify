@@ -13,11 +13,13 @@ import {
   liveStreak,
   resetEverything,
   setAvatar,
+  setAppearance,
   setDailyGoal,
   setProfileName,
   useAppState,
 } from "@/lib/store";
-import { colors } from "@/theme/colors";
+import type { Appearance } from "@/lib/types";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 const GOALS = [
@@ -28,6 +30,8 @@ const GOALS = [
 ];
 
 export default function ProfileScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const progress = useAppState((s) => s.progress);
   const courseCount = useAppState((s) => s.courses.length);
@@ -63,6 +67,8 @@ export default function ProfileScreen() {
         <Stat icon="school" color={colors.primary} value={courseCount} label="Courses" />
       </View>
 
+      <AppearanceCard />
+
       <Card style={{ gap: 12 }}>
         <Text style={styles.cardTitle}>Daily goal</Text>
         <Muted>How much do you want to learn each day?</Muted>
@@ -73,7 +79,7 @@ export default function ProfileScreen() {
               key={g.xp}
               onPress={() => setDailyGoal(g.xp)}
               accessibilityRole="radio"
-              accessibilityState={{ selected: active }}
+              aria-checked={active}
               style={[styles.goalRow, active && { borderColor: colors.primary, backgroundColor: colors.background }]}
             >
               <Text style={[styles.goalLabel, active && { color: colors.primary }]}>{g.label}</Text>
@@ -91,6 +97,7 @@ export default function ProfileScreen() {
 }
 
 function AccountCard() {
+  const styles = useStyles();
   const session = useAccount((a) => a.session);
   const profile = useAccount((a) => a.profile);
   const [requests, setRequests] = useState(0);
@@ -145,6 +152,8 @@ function AccountCard() {
 }
 
 function ProfileHeader() {
+  const colors = useColors();
+  const styles = useStyles();
   const profile = useAppState((s) => s.profile);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(profile.name);
@@ -238,7 +247,45 @@ function ProfileHeader() {
   );
 }
 
+const APPEARANCES: { value: Appearance; label: string; icon: IconName }[] = [
+  { value: "system", label: "System", icon: "phone" },
+  { value: "light", label: "Light", icon: "sun" },
+  { value: "dark", label: "Dark", icon: "moon" },
+];
+
+function AppearanceCard() {
+  const colors = useColors();
+  const styles = useStyles();
+  const appearance = useAppState((s) => s.settings.appearance);
+  return (
+    <Card style={{ gap: 12 }}>
+      <Text style={styles.cardTitle}>Appearance</Text>
+      <View style={styles.segment} accessibilityRole="radiogroup">
+        {APPEARANCES.map((a) => {
+          const active = appearance === a.value;
+          return (
+            <Pressable
+              key={a.value}
+              onPress={() => setAppearance(a.value)}
+              accessibilityRole="radio"
+              aria-checked={active}
+              style={[styles.segmentItem, active && styles.segmentActive]}
+            >
+              <Icon name={a.icon} size={17} color={active ? colors.textOnPrimary : colors.textMuted} />
+              <Text style={[styles.segmentText, active && { color: colors.textOnPrimary }]}>{a.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      <Muted style={{ fontSize: 13 }}>
+        {appearance === "system" ? "Matches your phone’s light or dark setting." : `Always ${appearance}.`}
+      </Muted>
+    </Card>
+  );
+}
+
 function Stat({ icon, color, value, label }: { icon: IconName; color: string; value: number; label: string }) {
+  const styles = useStyles();
   return (
     <Card style={styles.stat}>
       <Icon name={icon} size={26} color={color} />
@@ -248,60 +295,74 @@ function Stat({ icon, color, value, label }: { icon: IconName; color: string; va
   );
 }
 
-const styles = StyleSheet.create({
-  profileCard: { alignItems: "center", gap: 12, paddingVertical: 24 },
-  accountRow: { flexDirection: "row", alignItems: "center", gap: 12 },
-  accountLabel: { color: colors.textMuted, fontSize: 13 },
-  accountHandle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
-  link: { color: colors.primary, fontWeight: "700", fontSize: 14 },
-  signOut: { color: colors.textFaint, fontWeight: "600", fontSize: 14 },
-  cameraBadge: {
-    position: "absolute",
-    right: -2,
-    bottom: -2,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-    borderWidth: 2,
-    borderColor: colors.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  nameRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 4 },
-  name: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3 },
-  nameEditRow: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "stretch" },
-  nameInput: {
-    flex: 1,
-    backgroundColor: colors.background,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    color: colors.text,
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  saveButton: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12 },
-  saveText: { color: colors.textOnPrimary, fontWeight: "700" },
-  removePhoto: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
-  photoError: { color: colors.wrong, fontWeight: "700", textAlign: "center" },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
-  stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
-  statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 30, fontVariant: ["tabular-nums"] },
-  statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "700" },
-  cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
-  goalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: colors.surfaceRaised,
-  },
-  goalLabel: { color: colors.text, fontWeight: "700", fontSize: 15 },
-  goalXp: { color: colors.textMuted, fontWeight: "600" },
-  reset: { alignSelf: "center", padding: 12 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    segment: { flexDirection: "row", backgroundColor: colors.surfaceRaised, borderRadius: 12, padding: 4, gap: 4 },
+    segmentItem: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      paddingVertical: 10,
+      borderRadius: 9,
+    },
+    segmentActive: { backgroundColor: colors.primary },
+    segmentText: { color: colors.textMuted, fontWeight: "700", fontSize: 14 },
+    profileCard: { alignItems: "center", gap: 12, paddingVertical: 24 },
+    accountRow: { flexDirection: "row", alignItems: "center", gap: 12 },
+    accountLabel: { color: colors.textMuted, fontSize: 13 },
+    accountHandle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
+    link: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+    signOut: { color: colors.textFaint, fontWeight: "600", fontSize: 14 },
+    cameraBadge: {
+      position: "absolute",
+      right: -2,
+      bottom: -2,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.primary,
+      borderWidth: 2,
+      borderColor: colors.surface,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    nameRow: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 4 },
+    name: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3 },
+    nameEditRow: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "stretch" },
+    nameInput: {
+      flex: 1,
+      backgroundColor: colors.background,
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      borderRadius: 14,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      color: colors.text,
+      fontSize: 18,
+      fontWeight: "700",
+    },
+    saveButton: { backgroundColor: colors.primary, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 12 },
+    saveText: { color: colors.textOnPrimary, fontWeight: "700" },
+    removePhoto: { color: colors.textFaint, fontWeight: "700", fontSize: 13 },
+    photoError: { color: colors.wrong, fontWeight: "700", textAlign: "center" },
+    grid: { flexDirection: "row", flexWrap: "wrap", gap: 12 },
+    stat: { flexBasis: "47%", flexGrow: 1, gap: 4, padding: 16 },
+    statValue: { color: colors.text, fontFamily: fonts.display, fontSize: 30, fontVariant: ["tabular-nums"] },
+    statLabel: { color: colors.textMuted, fontSize: 13, fontWeight: "700" },
+    cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 20 },
+    goalRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+      borderWidth: 1.5,
+      borderColor: colors.surfaceRaised,
+    },
+    goalLabel: { color: colors.text, fontWeight: "700", fontSize: 15 },
+    goalXp: { color: colors.textMuted, fontWeight: "600" },
+    reset: { alignSelf: "center", padding: 12 },
+  }),
+);

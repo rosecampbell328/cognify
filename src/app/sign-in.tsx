@@ -16,13 +16,15 @@ import {
 } from "@/lib/social/account";
 import { socialEnabled } from "@/lib/social/client";
 import { useAppState } from "@/lib/store";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 
 type Step = "email" | "code" | "username";
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function SignInScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const localName = useAppState((s) => s.profile.name);
   const [step, setStep] = useState<Step>(() => (getAccount().session && !getAccount().profile ? "username" : "email"));
@@ -193,33 +195,35 @@ export default function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    color: colors.text,
-    fontSize: 17,
-  },
-  codeInput: { fontSize: 26, letterSpacing: 8, textAlign: "center", fontWeight: "700" },
-  row: { flexDirection: "row", justifyContent: "space-between" },
-  link: { color: colors.primary, fontWeight: "700" },
-  handleBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 16,
-  },
-  at: { color: colors.textMuted, fontSize: 18, fontWeight: "700" },
-  handleInput: { flex: 1, paddingVertical: 14, paddingLeft: 4, color: colors.text, fontSize: 18 },
-  hint: { color: colors.textFaint, fontSize: 13 },
-  label: { color: colors.text, fontWeight: "700", fontSize: 15, marginBottom: -8 },
-  notice: { color: colors.correct, fontWeight: "600" },
-  error: { color: colors.wrong, fontWeight: "700" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    input: {
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 14,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      color: colors.text,
+      fontSize: 17,
+    },
+    codeInput: { fontSize: 26, letterSpacing: 8, textAlign: "center", fontWeight: "700" },
+    row: { flexDirection: "row", justifyContent: "space-between" },
+    link: { color: colors.primary, fontWeight: "700" },
+    handleBox: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 14,
+      paddingHorizontal: 16,
+    },
+    at: { color: colors.textMuted, fontSize: 18, fontWeight: "700" },
+    handleInput: { flex: 1, paddingVertical: 14, paddingLeft: 4, color: colors.text, fontSize: 18 },
+    hint: { color: colors.textFaint, fontSize: 13 },
+    label: { color: colors.text, fontWeight: "700", fontSize: 15, marginBottom: -8 },
+    notice: { color: colors.correct, fontWeight: "600" },
+    error: { color: colors.wrong, fontWeight: "700" },
+  }),
+);

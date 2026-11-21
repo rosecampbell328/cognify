@@ -8,7 +8,7 @@ import { Button, Eyebrow, Icon, Muted, ProgressBar } from "@/components/ui";
 import { xpForLesson } from "@/lib/progress";
 import { completeLesson, useAppState } from "@/lib/store";
 import type { Exercise } from "@/lib/types";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 type QueueItem = { exercise: Exercise; retry: boolean; key: string };
@@ -21,6 +21,8 @@ const TYPE_LABEL: Record<Exercise["type"], string> = {
 };
 
 export default function LessonScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { courseId, lessonId } = useLocalSearchParams<{ courseId: string; lessonId: string }>();
   const insets = useSafeAreaInsets();
   const lesson = useAppState((s) => s.courses.find((c) => c.id === courseId)?.lessons.find((l) => l.id === lessonId));
@@ -187,6 +189,8 @@ function Option({
   state: "idle" | "correct" | "wrong" | "dim";
   onPress: () => void;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   const accent =
     state === "correct" ? colors.correct : state === "wrong" ? colors.wrong : selected ? colors.primary : colors.border;
   const bg =
@@ -197,7 +201,7 @@ function Option({
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      aria-selected={selected}
       style={({ pressed }) => [
         styles.option,
         { borderColor: accent, backgroundColor: bg, opacity: state === "dim" ? 0.45 : pressed && state === "idle" ? 0.8 : 1 },
@@ -215,6 +219,7 @@ function Option({
 }
 
 function Flashcard({ exercise, flipped, onFlip }: { exercise: Exercise; flipped: boolean; onFlip: () => void }) {
+  const styles = useStyles();
   return (
     <Pressable onPress={onFlip} accessibilityRole="button" accessibilityHint="Reveals the answer">
       <View style={styles.card}>
@@ -233,6 +238,8 @@ function Flashcard({ exercise, flipped, onFlip }: { exercise: Exercise; flipped:
 }
 
 function Results({ xp, accuracy, title }: { xp: number; accuracy: number; title: string }) {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const pct = Math.round(accuracy * 100);
   const note =
@@ -271,84 +278,86 @@ function Results({ xp, accuracy, title }: { xp: number; accuracy: number; title:
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  topRow: { flexDirection: "row", alignItems: "center", gap: 16, paddingHorizontal: 20 },
-  retryTag: { backgroundColor: colors.wrongBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
-  retryText: { color: colors.wrong, fontWeight: "700", fontSize: 12 },
-  prompt: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 24, lineHeight: 32 },
-  option: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    borderWidth: 1.5,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-  },
-  optionKey: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  optionKeyText: { color: colors.textMuted, fontWeight: "700", fontSize: 13 },
-  optionText: { flex: 1, color: colors.text, fontSize: 17, lineHeight: 23 },
-  footer: {
-    paddingHorizontal: 20,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    backgroundColor: colors.background,
-  },
-  feedback: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    gap: 6,
-  },
-  feedbackTitle: { fontFamily: fonts.display, fontSize: 19 },
-  feedbackBody: { color: colors.text, fontSize: 15, lineHeight: 21 },
-  card: {
-    minHeight: 240,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.surface,
-    padding: 24,
-    gap: 16,
-    justifyContent: "center",
-  },
-  cardFront: { color: colors.text, fontFamily: fonts.display, fontSize: 28, lineHeight: 35 },
-  cardHint: { color: colors.textFaint, fontSize: 14 },
-  cardBackWrap: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, gap: 6 },
-  cardBack: { color: colors.text, fontSize: 18, lineHeight: 26 },
-  resultMark: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: colors.correct,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  resultTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 34, letterSpacing: -0.4 },
-  summary: {
-    flexDirection: "row",
-    alignSelf: "stretch",
-    marginTop: 18,
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 18,
-  },
-  summaryCell: { flex: 1, alignItems: "center", gap: 4 },
-  summaryDivider: { width: 1, backgroundColor: colors.border },
-  summaryValue: { color: colors.text, fontFamily: fonts.display, fontSize: 32, fontVariant: ["tabular-nums"] },
-  summaryLabelRow: { flexDirection: "row", alignItems: "center", gap: 5 },
-  summaryLabel: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    center: { flex: 1, alignItems: "center", justifyContent: "center" },
+    topRow: { flexDirection: "row", alignItems: "center", gap: 16, paddingHorizontal: 20 },
+    retryTag: { backgroundColor: colors.wrongBg, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 3 },
+    retryText: { color: colors.wrong, fontWeight: "700", fontSize: 12 },
+    prompt: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 24, lineHeight: 32 },
+    option: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+      borderWidth: 1.5,
+      borderRadius: 14,
+      paddingVertical: 14,
+      paddingHorizontal: 14,
+    },
+    optionKey: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      borderWidth: 1.5,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    optionKeyText: { color: colors.textMuted, fontWeight: "700", fontSize: 13 },
+    optionText: { flex: 1, color: colors.text, fontSize: 17, lineHeight: 23 },
+    footer: {
+      paddingHorizontal: 20,
+      paddingTop: 14,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      backgroundColor: colors.background,
+    },
+    feedback: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      borderLeftWidth: 4,
+      paddingHorizontal: 14,
+      paddingVertical: 12,
+      gap: 6,
+    },
+    feedbackTitle: { fontFamily: fonts.display, fontSize: 19 },
+    feedbackBody: { color: colors.text, fontSize: 15, lineHeight: 21 },
+    card: {
+      minHeight: 240,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
+      padding: 24,
+      gap: 16,
+      justifyContent: "center",
+    },
+    cardFront: { color: colors.text, fontFamily: fonts.display, fontSize: 28, lineHeight: 35 },
+    cardHint: { color: colors.textFaint, fontSize: 14 },
+    cardBackWrap: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 16, gap: 6 },
+    cardBack: { color: colors.text, fontSize: 18, lineHeight: 26 },
+    resultMark: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: colors.correct,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    resultTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 34, letterSpacing: -0.4 },
+    summary: {
+      flexDirection: "row",
+      alignSelf: "stretch",
+      marginTop: 18,
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 18,
+    },
+    summaryCell: { flex: 1, alignItems: "center", gap: 4 },
+    summaryDivider: { width: 1, backgroundColor: colors.border },
+    summaryValue: { color: colors.text, fontFamily: fonts.display, fontSize: 32, fontVariant: ["tabular-nums"] },
+    summaryLabelRow: { flexDirection: "row", alignItems: "center", gap: 5 },
+    summaryLabel: { color: colors.textMuted, fontWeight: "600", fontSize: 13 },
+  }),
+);

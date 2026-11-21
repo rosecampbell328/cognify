@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from "react";
 
 import { kv } from "./kv";
-import type { AppState, Course, Profile, Progress, Source } from "./types";
+import type { Appearance, AppState, Course, Profile, Progress, Settings, Source } from "./types";
 
 const STORAGE_KEY = "cognify.state.v1";
 
@@ -17,7 +17,15 @@ const defaultProgress: Progress = {
 
 const defaultProfile: Profile = { name: "Rose Campbell", avatarUri: null };
 
-const emptyState: AppState = { profile: defaultProfile, sources: [], courses: [], progress: defaultProgress };
+const defaultSettings: Settings = { appearance: "system" };
+
+const emptyState: AppState = {
+  settings: defaultSettings,
+  profile: defaultProfile,
+  sources: [],
+  courses: [],
+  progress: defaultProgress,
+};
 
 function load(): AppState {
   try {
@@ -25,6 +33,7 @@ function load(): AppState {
     if (!raw) return emptyState;
     const parsed = JSON.parse(raw) as Partial<AppState>;
     return {
+      settings: { ...defaultSettings, ...parsed.settings },
       profile: { ...defaultProfile, ...parsed.profile },
       sources: parsed.sources ?? [],
       courses: parsed.courses ?? [],
@@ -149,6 +158,10 @@ export function setProfileName(name: string) {
 
 export function setAvatar(avatarUri: string | null) {
   setState({ ...state, profile: { ...state.profile, avatarUri } });
+}
+
+export function setAppearance(appearance: Appearance) {
+  setState({ ...state, settings: { ...state.settings, appearance } });
 }
 
 export function setDailyGoal(goal: number) {

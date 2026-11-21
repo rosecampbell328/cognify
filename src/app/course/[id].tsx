@@ -11,7 +11,7 @@ import { socialEnabled } from "@/lib/social/client";
 import { shareCourse } from "@/lib/social/courses";
 import { removeCourse, useAppState } from "@/lib/store";
 import type { Lesson } from "@/lib/types";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 type Status = "done" | "current" | "locked";
@@ -19,6 +19,8 @@ type Status = "done" | "current" | "locked";
 const RAIL = 30; // width of the timeline column
 
 export default function CourseScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const course = useAppState((s) => s.courses.find((c) => c.id === id));
@@ -176,6 +178,8 @@ export default function CourseScreen() {
 }
 
 function Marker({ status, number }: { status: Status; number: number }) {
+  const colors = useColors();
+  const styles = useStyles();
   if (status === "done") {
     return (
       <View style={[styles.marker, styles.markerDone]}>
@@ -203,6 +207,8 @@ function LessonCard({
   best?: number;
   onPress: () => void;
 }) {
+  const colors = useColors();
+  const styles = useStyles();
   const count = lesson.exercises.length;
   const minutes = Math.max(1, Math.round(count * 0.5));
 
@@ -251,76 +257,78 @@ function LessonCard({
   );
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: "center", justifyContent: "center" },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingBottom: 8,
-  },
-  headerActions: { flexDirection: "row", alignItems: "center", gap: 18 },
-  shareButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.secondary,
-  },
-  shareText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
-  intro: { paddingTop: 8, paddingBottom: 18, gap: 8 },
-  emoji: { fontSize: 40 },
-  title: { color: colors.text, fontFamily: fonts.display, fontSize: 30, lineHeight: 36, letterSpacing: -0.4 },
-  description: { color: colors.textMuted, fontSize: 16, lineHeight: 23 },
-  progressRow: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 8 },
-  progressText: { color: colors.textMuted, fontWeight: "700", fontVariant: ["tabular-nums"] },
-  row: { flexDirection: "row", gap: 14 },
-  railCol: { width: RAIL, alignItems: "center" },
-  railLine: { width: 2, flex: 1, marginVertical: 4, borderRadius: 1 },
-  marker: {
-    width: RAIL,
-    height: RAIL,
-    borderRadius: RAIL / 2,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 14,
-  },
-  markerDone: { backgroundColor: colors.xp },
-  markerCurrent: { backgroundColor: colors.primary },
-  markerLocked: { backgroundColor: colors.background, borderWidth: 1.5, borderColor: colors.lockedEdge },
-  markerText: { color: colors.lockedText, fontWeight: "700", fontSize: 13 },
-  card: {
-    flex: 1,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 16,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 14,
-    gap: 4,
-  },
-  cardCurrent: {
-    backgroundColor: colors.background,
-    borderColor: colors.primary,
-    borderWidth: 1.5,
-    boxShadow: colors.liftShadow,
-    gap: 6,
-    paddingVertical: 18,
-  },
-  cardLocked: { backgroundColor: "transparent", borderStyle: "dashed", borderColor: colors.lockedEdge },
-  cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
-  cardTitleSmall: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 17, lineHeight: 22 },
-  cardSummary: { color: colors.textMuted, fontSize: 15, lineHeight: 21 },
-  cardMeta: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
-  review: { color: colors.primary, fontWeight: "700", fontSize: 14 },
-  finish: { flex: 1, paddingTop: 18, paddingBottom: 8 },
-  finishText: { color: colors.textFaint, fontSize: 14 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    center: { flex: 1, alignItems: "center", justifyContent: "center" },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      paddingBottom: 8,
+    },
+    headerActions: { flexDirection: "row", alignItems: "center", gap: 18 },
+    shareButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: colors.secondary,
+    },
+    shareText: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+    intro: { paddingTop: 8, paddingBottom: 18, gap: 8 },
+    emoji: { fontSize: 40 },
+    title: { color: colors.text, fontFamily: fonts.display, fontSize: 30, lineHeight: 36, letterSpacing: -0.4 },
+    description: { color: colors.textMuted, fontSize: 16, lineHeight: 23 },
+    progressRow: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 8 },
+    progressText: { color: colors.textMuted, fontWeight: "700", fontVariant: ["tabular-nums"] },
+    row: { flexDirection: "row", gap: 14 },
+    railCol: { width: RAIL, alignItems: "center" },
+    railLine: { width: 2, flex: 1, marginVertical: 4, borderRadius: 1 },
+    marker: {
+      width: RAIL,
+      height: RAIL,
+      borderRadius: RAIL / 2,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 14,
+    },
+    markerDone: { backgroundColor: colors.xp },
+    markerCurrent: { backgroundColor: colors.primary },
+    markerLocked: { backgroundColor: colors.background, borderWidth: 1.5, borderColor: colors.lockedEdge },
+    markerText: { color: colors.lockedText, fontWeight: "700", fontSize: 13 },
+    card: {
+      flex: 1,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 16,
+      paddingHorizontal: 16,
+      paddingVertical: 14,
+      marginBottom: 14,
+      gap: 4,
+    },
+    cardCurrent: {
+      backgroundColor: colors.background,
+      borderColor: colors.primary,
+      borderWidth: 1.5,
+      boxShadow: colors.liftShadow,
+      gap: 6,
+      paddingVertical: 18,
+    },
+    cardLocked: { backgroundColor: "transparent", borderStyle: "dashed", borderColor: colors.lockedEdge },
+    cardTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 22, lineHeight: 28 },
+    cardTitleSmall: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 17, lineHeight: 22 },
+    cardSummary: { color: colors.textMuted, fontSize: 15, lineHeight: 21 },
+    cardMeta: { color: colors.textFaint, fontSize: 13, fontWeight: "600" },
+    review: { color: colors.primary, fontWeight: "700", fontSize: 14 },
+    finish: { flex: 1, paddingTop: 18, paddingBottom: 8 },
+    finishText: { color: colors.textFaint, fontSize: 14 },
+  }),
+);
 
 function notify(title: string, message: string) {
   if (Platform.OS === "web") globalThis.alert?.(`${title}\n\n${message}`);

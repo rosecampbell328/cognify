@@ -6,10 +6,11 @@ import { Card, Button, Heading, Icon, Muted } from "@/components/ui";
 import { removeSource, useAppState } from "@/lib/store";
 import type { Source } from "@/lib/types";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 export default function LibraryScreen() {
+  const colors = useColors();
   const insets = useSafeAreaInsets();
   const sources = useAppState((s) => s.sources);
 
@@ -36,6 +37,8 @@ export default function LibraryScreen() {
 }
 
 function SourceRow({ source }: { source: Source }) {
+  const colors = useColors();
+  const styles = useStyles();
   const { create, busy } = useCreateCourse();
   const words = source.content.trim().split(/\s+/).length;
 
@@ -76,16 +79,18 @@ function SourceRow({ source }: { source: Source }) {
   );
 }
 
-const styles = StyleSheet.create({
-  iconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: colors.background,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 17 },
-  meta: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
-  preview: { color: colors.textFaint, fontSize: 14, lineHeight: 20 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    iconBox: {
+      width: 44,
+      height: 44,
+      borderRadius: 14,
+      backgroundColor: colors.background,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    title: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 17 },
+    meta: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
+    preview: { color: colors.textFaint, fontSize: 14, lineHeight: 20 },
+  }),
+);

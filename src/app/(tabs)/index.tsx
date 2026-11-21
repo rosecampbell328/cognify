@@ -9,7 +9,7 @@ import { courseProgress } from "@/lib/progress";
 import { SAMPLE_SOURCE } from "@/lib/sample";
 import { addSource, liveStreak, liveTodayXp, useAppState } from "@/lib/store";
 import { useCreateCourse } from "@/lib/useCreateCourse";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 function greetingFor(date = new Date()) {
@@ -18,6 +18,8 @@ function greetingFor(date = new Date()) {
 }
 
 export default function LearnScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const courses = useAppState((s) => s.courses);
   const progress = useAppState((s) => s.progress);
@@ -144,6 +146,7 @@ export default function LearnScreen() {
 }
 
 function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean }) {
+  const colors = useColors();
   return (
     <Card style={{ alignItems: "center", gap: 14, paddingVertical: 28 }}>
       <LogoMark size={84} style={{ boxShadow: colors.liftShadow }} />
@@ -178,37 +181,39 @@ function EmptyState({ onSample, busy }: { onSample: () => void; busy: boolean })
   );
 }
 
-const styles = StyleSheet.create({
-  topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  greeting: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3, marginTop: -4 },
-  brand: { flexDirection: "row", alignItems: "center", gap: 9 },
-  wordmark: { color: colors.primary, fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
-  goalNumbers: { color: colors.text, fontWeight: "700", fontVariant: ["tabular-nums"] },
-  sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 },
-  link: { color: colors.primary, fontWeight: "700", fontSize: 15 },
-  courseCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 14,
-  },
-  courseEmoji: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  courseTitle: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 18, lineHeight: 23 },
-  resumeCard: { backgroundColor: colors.background, borderColor: colors.primary, borderWidth: 1.5, boxShadow: colors.liftShadow, gap: 4 },
-  resumeTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 24, lineHeight: 30, marginTop: 2 },
-  resumeMeta: { color: colors.textMuted, fontSize: 14 },
-  courseMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    topBar: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+    greeting: { color: colors.text, fontFamily: fonts.display, fontSize: 28, letterSpacing: -0.3, marginTop: -4 },
+    brand: { flexDirection: "row", alignItems: "center", gap: 9 },
+    wordmark: { color: colors.primary, fontFamily: fonts.display, fontSize: 26, letterSpacing: -0.5 },
+    goalNumbers: { color: colors.text, fontWeight: "700", fontVariant: ["tabular-nums"] },
+    sectionRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 4 },
+    link: { color: colors.primary, fontWeight: "700", fontSize: 15 },
+    courseCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 14,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      padding: 14,
+    },
+    courseEmoji: {
+      width: 56,
+      height: 56,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    courseTitle: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 18, lineHeight: 23 },
+    resumeCard: { backgroundColor: colors.background, borderColor: colors.primary, borderWidth: 1.5, boxShadow: colors.liftShadow, gap: 4 },
+    resumeTitle: { color: colors.text, fontFamily: fonts.display, fontSize: 24, lineHeight: 30, marginTop: 2 },
+    resumeMeta: { color: colors.textMuted, fontSize: 14 },
+    courseMeta: { color: colors.textMuted, fontSize: 13, fontWeight: "600" },
+  }),
+);

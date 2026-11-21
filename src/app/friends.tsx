@@ -14,10 +14,12 @@ import {
   type FriendsOverview,
 } from "@/lib/social/friends";
 import type { PublicProfile } from "@/lib/social/types";
-import { colors } from "@/theme/colors";
+import { makeStyles, useColors } from "@/theme/theme";
 import { fonts } from "@/theme/type";
 
 export default function FriendsScreen() {
+  const colors = useColors();
+  const styles = useStyles();
   const insets = useSafeAreaInsets();
   const signedIn = useAccount((a) => !!a.profile);
   const [overview, setOverview] = useState<FriendsOverview | null>(null);
@@ -157,6 +159,7 @@ function PersonRow({
   showStats?: boolean;
   children?: React.ReactNode;
 }) {
+  const styles = useStyles();
   const name = person.display_name || `@${person.username}`;
   // The person (opens their profile) and the action buttons sit side by side —
   // never buttons inside a button.
@@ -185,6 +188,8 @@ function PersonRow({
 }
 
 function SmallButton({ label, solid, onPress }: { label: string; solid?: boolean; onPress: () => void }) {
+  const colors = useColors();
+  const styles = useStyles();
   return (
     <Pressable
       onPress={onPress}
@@ -197,40 +202,42 @@ function SmallButton({ label, solid, onPress }: { label: string; solid?: boolean
   );
 }
 
-const styles = StyleSheet.create({
-  header: { paddingHorizontal: 20, paddingBottom: 6 },
-  searchBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    backgroundColor: colors.surface,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-  },
-  searchInput: { flex: 1, paddingVertical: 13, color: colors.text, fontSize: 16 },
-  error: { color: colors.wrong, fontWeight: "600" },
-  person: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 16,
-    padding: 12,
-  },
-  personMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
-  personName: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 16 },
-  personMeta: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
-  small: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: colors.secondary,
-  },
-  smallSolid: { backgroundColor: colors.primary, borderColor: colors.primary },
-  smallText: { color: colors.primary, fontWeight: "700", fontSize: 13 },
-});
+const useStyles = makeStyles((colors) =>
+  StyleSheet.create({
+    header: { paddingHorizontal: 20, paddingBottom: 6 },
+    searchBox: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      backgroundColor: colors.surface,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      borderRadius: 14,
+      paddingHorizontal: 14,
+    },
+    searchInput: { flex: 1, paddingVertical: 13, color: colors.text, fontSize: 16 },
+    error: { color: colors.wrong, fontWeight: "600" },
+    person: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 16,
+      padding: 12,
+    },
+    personMain: { flex: 1, flexDirection: "row", alignItems: "center", gap: 12 },
+    personName: { color: colors.text, fontFamily: fonts.displayMedium, fontSize: 16 },
+    personMeta: { color: colors.textMuted, fontSize: 13, marginTop: 2 },
+    small: {
+      paddingHorizontal: 12,
+      paddingVertical: 7,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colors.secondary,
+    },
+    smallSolid: { backgroundColor: colors.primary, borderColor: colors.primary },
+    smallText: { color: colors.primary, fontWeight: "700", fontSize: 13 },
+  }),
+);
